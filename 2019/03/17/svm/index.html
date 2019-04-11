@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="machine learning,svm,Data Science,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="支持向量机分隔超平面为$w^Tx + b$常数b类似于回归里的$w_0$ 因为w为超平面的法向量，其中设距离为$\gamma$,$x_i 到x_0$的距离为$\gamma$,其中$x_0$为在平面的点，x为要求距离的点， x的向量为$x_0 + \gamma \frac{w}{||w||}$ ,其中$\frac{w}{||w||}$为向量w的的单位向量，又有$w^Tx_0 + b = 0$与$w^">
+<meta name="keywords" content="machine learning,svm,Data Science">
+<meta property="og:type" content="article">
+<meta property="og:title" content="svm">
+<meta property="og:url" content="https://yueyec.github.io/2019/03/17/svm/index.html">
+<meta property="og:site_name" content="Yueyec&#39;s Blog">
+<meta property="og:description" content="支持向量机分隔超平面为$w^Tx + b$常数b类似于回归里的$w_0$ 因为w为超平面的法向量，其中设距离为$\gamma$,$x_i 到x_0$的距离为$\gamma$,其中$x_0$为在平面的点，x为要求距离的点， x的向量为$x_0 + \gamma \frac{w}{||w||}$ ,其中$\frac{w}{||w||}$为向量w的的单位向量，又有$w^Tx_0 + b = 0$与$w^">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yueyec.github.io/public/pic/output_55_1.png">
+<meta property="og:image" content="https://yueyec.github.io/public/pic/output_56_1.png">
+<meta property="og:image" content="https://yueyec.github.io/public/pic/output_57_1.png">
+<meta property="og:image" content="https://yueyec.github.io/public/pic/output_58_1.png">
+<meta property="og:updated_time" content="2019-04-11T14:04:16.639Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="svm">
+<meta name="twitter:description" content="支持向量机分隔超平面为$w^Tx + b$常数b类似于回归里的$w_0$ 因为w为超平面的法向量，其中设距离为$\gamma$,$x_i 到x_0$的距离为$\gamma$,其中$x_0$为在平面的点，x为要求距离的点， x的向量为$x_0 + \gamma \frac{w}{||w||}$ ,其中$\frac{w}{||w||}$为向量w的的单位向量，又有$w^Tx_0 + b = 0$与$w^">
+<meta name="twitter:image" content="https://yueyec.github.io/public/pic/output_55_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yueyec.github.io/2019/03/17/svm/">
+
+
+
+
+
+  <title>svm | Yueyec's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yueyec's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yueyec.github.io/2019/03/17/svm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yueyec">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yueyec's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">svm</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-17T21:02:45+08:00">
+                2019-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Data-Science/" itemprop="url" rel="index">
+                    <span itemprop="name">Data Science</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="支持向量机"><a href="#支持向量机" class="headerlink" title="支持向量机"></a>支持向量机</h1><p>分隔超平面为$w^Tx + b$<br>常数b类似于回归里的$w_0$</p>
+<p>因为w为超平面的法向量，其中设距离为$\gamma$,$x_i 到x_0$的距离为$\gamma$,其中$x_0$为在平面的点，x为要求距离的点，</p>
+<p>x的向量为$x_0 + \gamma \frac{w}{||w||}$ ,其中$\frac{w}{||w||}$为向量w的的单位向量，又有$w^Tx_0 + b = 0$与$w^Tw = ||w||^2$</p>
+<p>$x-x_0 = \gamma \frac{\vec{w}}{||w||}$ 两边乘以$w^T$得</p>
+<p>$w^T(x-x_0)= \gamma \frac{w^Tw}{||w||}$</p>
+<p>$w^T(x-x_0)= \gamma \frac{||w||^2}{||w||}$</p>
+<p>$w^Tx + b=\gamma||w||$</p>
+<p>所以计算点A到平面的距离:值为$\frac{|w^TA + b| }{||w||}$</p>
+<p>当$y_i$为1,-1时，$\gamma = \frac{2}{||w||}$ $s.t. w^Tx+b &gt;= 1$</p>
+<p>所以求$\gamma$的最大值，就是求$\frac{1}{2}||w||^2$ $s.t. w^Tx+b &gt;= 1$的最小值</p>
+<p>用拉格朗日乘子法来把约束条件加到求解方程里</p>
+<p>$L(w,\alpha,b)=\frac{1}{2}||w||^2 + \sum\limits_{i=1}^m\alpha^i(1-y_i(w^Tx_i+b)$</p>
+<p>令$\theta(w)=\mathop{max}\limits_{a_{i} &gt;=0}L(w.\alpha,b)$</p>
+<p>$\mathop{min}\limits_{w,b}\theta(w)=\mathop{min}\limits_{w,b}\mathop{max}\limits_{a_i &gt;=0}L(w,\alpha,b)=p^*$</p>
+<p>用对偶性，最大和最小互换，但是有kkt条件需要满足,才能保证$p^<em>=d^</em>$</p>
+<p>$\mathop{max}\limits_{\alpha_i&gt;=0}\mathop{mim}\limits_{w,b}L(w,\alpha,b)=d^*$</p>
+<p>kkt条件为</p>
+<p>min(f(x)),</p>
+<p>$s.t. \\h_j(x)=0,j=1,2,..,p \\<br>g_k(x) &lt;=0,k=1,2,…,q \\<br>x\in X\subset R^n<br>$</p>
+<p>需要满足</p>
+<ol>
+<li>$L(w,\alpha,b)$对x求导为0</li>
+<li>$h_i(x)=0$</li>
+<li>$\alpha * g_k(x) =0$</li>
+</ol>
+<p>对w,或b求导得到<br>$\frac{\partial L}{\partial w}=0 得到 w= \sum\limits_{i=1}^n\alpha_iy_ix_i$</p>
+<p>$\frac{\partial L}{\partial b} =0 得到 \sum\limits_{i=1}^n\alpha_iy_i=0$</p>
+<p>把w带回L中得到，一个只有$\alpha$的方程,??为什么是减去</p>
+<p>$\mathop{max}\limits_{\alpha}\sum\limits_{i=1}^n\alpha_i - \frac{1}{2}\sum\limits_{i,j=1}^{n}\alpha_i\alpha_jy_iy_jx_i^Tx_j$</p>
+<p>$s.t. \alpha_i &gt;=0,i=1,2,…n, \\<br>\sum\limits_{i=1}^n\alpha_iy_i=0$</p>
+<h2 id="SMO内容"><a href="#SMO内容" class="headerlink" title="SMO内容"></a>SMO内容</h2><h3 id="alpha-的部分"><a href="#alpha-的部分" class="headerlink" title="$\alpha$的部分"></a>$\alpha$的部分</h3><p>将方程变形，乘以-1,变成一个最小的问题</p>
+<p>$\mathop{min}\limits_{\alpha}\frac{1}{2}\sum\limits_{i=1}^{n}\sum\limits_{j=1}^n\alpha_i\alpha_jy_iy_jx_i^Tx_j -\sum\limits_{i=1}^n\alpha_i  $</p>
+<p>$s.t. \alpha_i &gt;=0,i=1,2,…n, \\<br>\sum\limits_{i=1}^n\alpha_iy_i=0$</p>
+<p>加入松弛变量C，保证可以有部分不是线性可分的，条件变为</p>
+<p>$s.t. C&gt;= \alpha_i &gt;=0,i=1,2,…n, \\<br>\sum\limits_{i=1}^n\alpha_iy_i=0$</p>
+<p>SMO为更新两个$\alpha$</p>
+<p>则 $\alpha_1^{new}y_1 + \alpha_2^{new}y_2 = \alpha_1^{old}y_1 + \alpha_2^{old}y_2 = \zeta $</p>
+<p>固定其他的值，只改变$\alpha_2^{new}的解$先确定它的上下限</p>
+<p>$L&lt;=\alpha_2^{new}&lt;=H$</p>
+<p>因为$C&gt;=\alpha&gt;=0$ 和$\alpha_1^{new}y_1 + \alpha_2^{new}y_2 = \alpha_1^{old}y_1 + \alpha_2^{old}y_2 = \zeta $</p>
+<p>所以</p>
+<p>当$y_1\ne y_2$时</p>
+<p>$\alpha_1 - \alpha_2 = \zeta$</p>
+<p>$\alpha_2 = \alpha_1 - \zeta$</p>
+<p>得到</p>
+<p>$C-\zeta&gt;=\alpha_2 &gt;= -\zeta$</p>
+<p>结合$C&gt;=\alpha&gt;=0$,得到</p>
+<p>$L=max(0,-\zeta),H=min(C,C-\zeta)$</p>
+<p>同理，当$y_1=y_2$时，</p>
+<p>$L=max(0,\zeta-C),H=min(C,\zeta)$</p>
+<p>因此得到$\alpha_2^{new}$的上下界L和H为</p>
+<p>$L=max(0,\alpha_2^{old}-\alpha_1^{old}),H=min(C,C+\alpha_2^{old} -\alpha_1^{old}),ify_1\ne y_2$</p>
+<p>$L=max(0,\alpha_2^{old}+\alpha_1^{old}-C),H=min(C,\alpha_2^{old} +\alpha_1^{old}),ify_1= y_2$</p>
+<p>固定除了$\alpha_1 \alpha_2的其他变量$</p>
+<p>$w(\alpha_2) = \sum\limits_{i=1}^n\alpha_i - \frac{1}{2}\sum\limits_{i=1}^n\sum\limits_{i=1}^ny_iy_jx_i^Tx_j\alpha_i\alpha_j$</p>
+<p>将$\alpha_1 \alpha_2$提出来得到</p>
+<p>$w(\alpha_2) = \alpha_1 + \alpha_2 - \frac{1}{2}\alpha_1^2x_1^Tx_1 - \frac{1}{2}\alpha_2^2x_2^Tx_2 - y_1y_2\alpha_1\alpha_2x_1^Tx_2 - y_1\alpha_1v_1 - y_2\alpha_2v_2 + constant$ </p>
+<p>其中</p>
+<p>定义$f(x_i) = \sum\limits_{j=1}^n\alpha_jy_jx_i^Tx_j + b$</p>
+<p>$v_i =\sum\limits_{j=3}^n\alpha_jy_jx_i^Tx_j  = f(x_i) -\sum\limits_{j=1}^2\alpha_jy_jx_i^Tx_j- b $</p>
+<p>之后找到$\alpha_1和\alpha_2的关系$</p>
+<p>因为$\sum\limits_{i=1}^n\alpha_iy_i=0$，所以将除了$\alpha_1y_1,\alpha_2y_2$的其他项看做常数-B</p>
+<p>$\alpha_1y_1 + \alpha_2y_2 = B$，等式乘以$y_1$得到</p>
+<p>$\alpha_1 = \gamma - s\alpha_2$ $，其中\gamma为By_1,s为y_1y_2$</p>
+<p>带入公式，并且进行偏导</p>
+<p>$\frac{\partial W(\alpha_2)}{\partial\alpha_2}=-s +1 +\gamma sx_1^Tx_1 - \alpha_2 x_1^Tx_1 - \alpha_2 x_2^Tx_2 - \gamma sx_1^Tx_2 + 2\alpha_2x_1^Tx_2 + y_2v_1 - y_2v_2 = 0$</p>
+<p>导入$s=y_1y_2$得到</p>
+<p>$\alpha_2^{new} = \frac{y_2(y_2-y_1+y_1\gamma(x_1^\intercal x_1 - x_1^\intercal x_2)+ v_1 -v_2)}{x_1^\intercal x_1 + x_2^\intercal x_2-2x_1^\intercal x_2}$</p>
+<p>令$E_i = f(x_i)-y_i$</p>
+<p>$\eta=x_1^Tx_1 + x_2^Tx_2 - 2x_1^Tx_2$</p>
+<p>$E_i$为误差项，$\eta$为学习速率</p>
+<p>已知$\gamma= \alpha_1^{old} + s\alpha_2^{old}$,和</p>
+<p>$v_j=\sum\limits_{i=3}^n\alpha_iy_ix_j^Tx_i  = f(x_j) -\sum\limits_{i=1}^2\alpha_iy_ix_j^Tx_i- b $$</p>
+<p>简化$\alpha_2^{new}$</p>
+<p>$\alpha_2^{new}=\alpha_2^{old} +\frac{y_2(E_1-E_2)}{\eta}$</p>
+<p>加上约束，最终得到的解为</p>
+<p>$\alpha_2^{new,clipped}=\begin{cases}<br>H,&amp; \mbox{if }a_2^{new} &gt;H \\<br>a_2^{new},&amp; \mbox{if }L&lt;=a_2^{new}&lt;=H \\<br>L,&amp; \mbox{if }a_2^{new} &lt;L<br>\end{cases}$</p>
+<p>又因为</p>
+<p>$\alpha_1^{old}=\gamma -s\alpha_2^{old}$</p>
+<p>$\alpha_1^{new} = \gamma -s\gamma_2^{new,clipped}$</p>
+<p>消去$\gamma$得到</p>
+<p>$\alpha_1^{new} = \alpha_1^{old} + y_1y_2(\alpha_2^{old} - \alpha_2^{new,clipped})$</p>
+<h3 id="b的部分"><a href="#b的部分" class="headerlink" title="b的部分"></a>b的部分</h3><p>根据$y_1(w^Tx_1 + b)=1$两边乘以$y_1$，得到</p>
+<p>$w^Tx_i+b =y_1$,又因为$w= \sum\limits_{i=1}^n\alpha_iy_ix_i$,得到</p>
+<p>$\sum\limits_{i=1}^n\alpha_iy_ix_ix_1 +b=y1$单独提出$\alpha_1,alpha_2$，得</p>
+<p>$b_1^{new} = y_1 -\sum\limits_{i=3}^n\alpha_iy_ix_i^Tx_1 - \alpha_1^{new}y_1x_1^Tx_1 - \alpha_2^{new}y_2x_2^Tx_1$</p>
+<p>其中前两项为<br>$y_1 -\sum\limits_{i=3}^n\alpha_iy_ix_i^Tx_1=-E_1 + \alpha_1^{old}y_1x_1^Tx_1 + \alpha_2^{old}y_2x_2^Tx_1 + b^{old}$</p>
+<p>整理得到</p>
+<p>$b_1^{new}=b^{old} -E_1-y_1(\alpha_1^{new}- \alpha_1^{old})x_1^Tx_1 -y_2(\alpha_2^{new}-\alpha_2^{old})x_2^Tx_1$</p>
+<p>同理得到$b_2^{new}$</p>
+<p>$b_2^{new}=b^{old} -E_2-y_1(\alpha_1^{new}- \alpha_1^{old})x_1^Tx_2 -y_2(\alpha_2^{new}-\alpha_2^{old})x_2^Tx_2$</p>
+<p>当$b_1,b_2都有效时，b^{new}=b_1^{new} = b_2^{new}$</p>
+<p>所以，b的取值为</p>
+<script type="math/tex; mode=display">b=\begin{cases}
+b_1,& \mbox{if }0<\alpha_1^{new} <C \\
+b_2,& \mbox{if }0<\alpha_2^{new} <C \\
+\frac{b_1 + b_1}{2},& \mbox{otherwise}
+\end{cases}</script><h3 id="SMO计算梳理"><a href="#SMO计算梳理" class="headerlink" title="SMO计算梳理"></a>SMO计算梳理</h3><ol>
+<li>计算误差$E_i$</li>
+</ol>
+<p>$E_i=f(x_i) - y_i = \sum\limits_{j=1}^n\alpha_jy_jx_i^Tx_j +b -y_i$</p>
+<ol>
+<li>计算上下限</li>
+</ol>
+<script type="math/tex; mode=display">\begin{cases}
+L=max(0,\alpha_2^{old}-\alpha_1^{old}),H=min(C,C+\alpha_2^{old} -\alpha_1^{old}),ify_1\ne y_2 \\
+L=max(0,\alpha_2^{old}+\alpha_1^{old}-C),H=min(C,\alpha_2^{old} +\alpha_1^{old}),ify_1= y_2
+\end{cases}</script><ol>
+<li>计算$\eta$</li>
+</ol>
+<p>$\eta=x_1^Tx_1 + x_2^Tx_2 - 2x_1^Tx_2$</p>
+<ol>
+<li>更新$\alpha_j$</li>
+</ol>
+<p>$\alpha_j^{new}=\alpha_j^{old} +\frac{y_j(E_1-E_j)}{\eta}$</p>
+<ol>
+<li>根据取值范围修剪$\alpha_j$</li>
+</ol>
+<p>$\alpha_j^{new,clipped}=\begin{cases}<br>H,&amp; \mbox{if }a_j^{new} &gt;H \\<br>a_2^{new},&amp; \mbox{if }L&lt;=a_j^{new}&lt;=H \\<br>L,&amp; \mbox{if }a_j^{new} &lt;L<br>\end{cases}$</p>
+<ol>
+<li>更新$\alpha_i$</li>
+</ol>
+<p>$alpha_i^{new} = \alpha_i^{old} + y_jy_i(\alpha_j^{old} - \alpha_j^{new,clipped})$</p>
+<ol>
+<li>更新$b_i,b_j$</li>
+</ol>
+<p>$b_i^{new}=b^{old} -E_i-y_i(\alpha_i^{new}- \alpha_i^{old})x_i^Tx_i -y_j(\alpha_j^{new}-\alpha_j^{old})x_j^Tx_i$</p>
+<p>$b_j^{new}=b^{old} -E_j-y_i(\alpha_i^{new}- \alpha_i^{old})x_i^Tx_j -y_j(\alpha_j^{new}-\alpha_j^{old})x_j^Tx_j$</p>
+<ol>
+<li>根据bi,bj更新b</li>
+</ol>
+<script type="math/tex; mode=display">b=\begin{cases}
+b_i,& \mbox{if }0<\alpha_i^{new} <C \\
+b_j,& \mbox{if }0<\alpha_j^{new} <C \\
+\frac{b_i + b_j}{2},& \mbox{otherwise}
+\end{cases}</script><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="comment">#SMO辅助函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loadDataset</span><span class="params">(file_name)</span>:</span></span><br><span class="line">    <span class="string">"""读取文件，得到两个list，</span></span><br><span class="line"><span class="string">    data_mat 为2列m行，label_mat为m个元素"""</span></span><br><span class="line">    data_mat=[];label_mat=[]</span><br><span class="line">    fr = open(file_name)</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> fr.readlines():</span><br><span class="line">        line_arr = line.strip().split(<span class="string">'\t'</span>)</span><br><span class="line">        data_mat.append([float(line_arr[<span class="number">0</span>]),float(line_arr[<span class="number">1</span>])])</span><br><span class="line">        label_mat.append(float(line_arr[<span class="number">2</span>]))</span><br><span class="line">    <span class="keyword">return</span> data_mat,label_mat</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">selectJrand</span><span class="params">(i,m)</span>:</span></span><br><span class="line">    <span class="string">"""根据i，随机选取一个不是i的j"""</span></span><br><span class="line">    <span class="keyword">import</span> random</span><br><span class="line">    j = i</span><br><span class="line">    <span class="keyword">while</span>(j==i):</span><br><span class="line">        j = int(random.uniform(<span class="number">0</span>,m))</span><br><span class="line">    <span class="keyword">return</span> j</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">clipAlpha</span><span class="params">(aj,H,L)</span>:</span></span><br><span class="line">    <span class="string">"""修剪alpha"""</span></span><br><span class="line">    <span class="keyword">if</span> aj &gt; H:</span><br><span class="line">        aj = H</span><br><span class="line">    <span class="keyword">elif</span> aj &lt; L:</span><br><span class="line">        aj = L</span><br><span class="line">    <span class="keyword">return</span> aj</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data_arr,label_arr = loadDataset(<span class="string">'../../Downloads/machinelearninginaction/Ch06/testSet.txt'</span>)</span><br><span class="line">len(data_arr)</span><br></pre></td></tr></table></figure>
+<pre><code>100
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set(label_arr)</span><br></pre></td></tr></table></figure>
+<pre><code>{-1.0, 1.0}
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#流程为</span></span><br><span class="line"><span class="comment">#创建一个alpha向量，初始化为0</span></span><br><span class="line"><span class="comment">#当迭代次数小于最大迭代次数时(外循环)</span></span><br><span class="line"><span class="comment">#  对数据集的每一个数据向量(内循环)</span></span><br><span class="line"><span class="comment">#    如果该向量可以被优化:</span></span><br><span class="line"><span class="comment">#       随机选择另一个数据向量</span></span><br><span class="line"><span class="comment">#       同时优化这两个向量</span></span><br><span class="line"><span class="comment">#       如果两个向量都不能被优化，退出内循环</span></span><br><span class="line"><span class="comment">#  如果所有向量都没有被优化，增加迭代数目，继续下一次循环</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">smo_simple</span><span class="params">(data_mat_in,class_labels,C,toler,max_iter)</span>:</span></span><br><span class="line">    <span class="string">"""数据集，数据标签，松弛常数，容错率，最大循环次数"""</span></span><br><span class="line">    data_matrix = np.mat(data_mat_in);label_mat =np.mat(class_labels).transpose()</span><br><span class="line">    b= <span class="number">0</span>;m,n = np.shape(data_matrix)</span><br><span class="line">    alphas = np.mat(np.zeros((m,<span class="number">1</span>)))</span><br><span class="line">    iter = <span class="number">0</span></span><br><span class="line">    <span class="comment">#外循环为总的循环数</span></span><br><span class="line">    <span class="keyword">while</span>(iter &lt; max_iter):</span><br><span class="line">        alpha_pairs_chanaged = <span class="number">0</span></span><br><span class="line">        <span class="comment">#内循环为每个求E_i,判断是否要优化，能优化则随机找一个j，进行优化，优化成功则改变alpha_pairs_changed，</span></span><br><span class="line">        <span class="comment">#一次内循环后，如果有改变则改iter为0，继续进行，如果最大循环次数中都没有改变则跳出外循环，得到结果</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">            <span class="comment">#1.求E_i</span></span><br><span class="line">            fx_i = float(np.multiply(alphas,label_mat).T * (data_matrix * data_matrix[i,:].T)) + b</span><br><span class="line">            e_i = fx_i - float(label_mat[i])</span><br><span class="line">            <span class="comment">#根据kkt标准</span></span><br><span class="line">            <span class="comment">#alpha=0时，y_ig(x_i) &gt;=1</span></span><br><span class="line">            <span class="comment">#0&lt;alpha&lt;C时，y_ig(x_i) = 1</span></span><br><span class="line">            <span class="comment">#alpha =C时，y_Ig(x_i) &lt;= 1</span></span><br><span class="line">            <span class="comment">#如果不符合其中的一条，则进行优化</span></span><br><span class="line">            <span class="keyword">if</span> ((label_mat[i] * e_i &lt; -toler) <span class="keyword">and</span> (alphas[i] &lt; C) <span class="keyword">or</span></span><br><span class="line">               ((label_mat[i] * e_i &gt; toler) <span class="keyword">and</span> (alphas[i] &gt; <span class="number">0</span>))):</span><br><span class="line">                j = selectJrand(i,m)</span><br><span class="line">                <span class="comment">#求出了f(x_j)</span></span><br><span class="line">                fx_j = float(np.multiply(alphas,label_mat).T * (data_matrix * data_matrix[j,:].T)) + b</span><br><span class="line">                <span class="comment">#fx_j = float(np.multiply(alphas,label_mat).T) * (data_matrix[j,:] * data_matrix.T).T + b #为原本方程的顺序</span></span><br><span class="line">                e_j = fx_j - float(label_mat[j]) <span class="comment">#得到E_j</span></span><br><span class="line">                </span><br><span class="line">                <span class="comment">#2.求上下限</span></span><br><span class="line">                alpha_i_old = alphas[i].copy()</span><br><span class="line">                alpha_j_old = alphas[j].copy()</span><br><span class="line">                <span class="keyword">if</span> (label_mat[i] != label_mat[j]):</span><br><span class="line">                    L = max(<span class="number">0</span>,alphas[j] - alphas[i])</span><br><span class="line">                    H = min(C,C+ alphas[j] - alphas[i])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    L = max(<span class="number">0</span>,alphas[j] + alphas[i] - C)</span><br><span class="line">                    H = min(C, alphas[j] + alphas[i])</span><br><span class="line">                <span class="keyword">if</span> L==H: <span class="comment">#上下限相等，C为0，或者都为C，或者一个为C，一个为0；C为0时，则alpha都是0，不成立；都为C时，没法增大也没法变小，一个为C，一个为0时，即alpha_i为C，并不会改变，还是C</span></span><br><span class="line">                    <span class="comment">#print('L==H')</span></span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="comment">#eta与原本的符号相反</span></span><br><span class="line">                eta = <span class="number">2.0</span> * data_matrix[i,:] * data_matrix[j,:].T - data_matrix[i,:] * data_matrix[i,:].T - data_matrix[j,:] * data_matrix[j,:].T</span><br><span class="line">                <span class="keyword">if</span> eta &gt;= <span class="number">0</span>: <span class="comment">#变化率为负数，并不符合，eta应为正数</span></span><br><span class="line">                    <span class="comment">#print('eta &gt;=0')</span></span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="comment">#原本的加上，现在为减去</span></span><br><span class="line">                alphas[j] -= label_mat[j] *(e_i - e_j)/eta</span><br><span class="line">                alphas[j] = clipAlpha(alphas[j],H,L)</span><br><span class="line">                <span class="keyword">if</span> (abs(alphas[j] - alpha_j_old) &lt;<span class="number">0.00001</span>):</span><br><span class="line">                    <span class="comment">#print('j not moving enough') #变化太小，跳出本次循环，换其他j</span></span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                alphas[i] += label_mat[i]*label_mat[j] *(alpha_j_old - alphas[j])</span><br><span class="line">                </span><br><span class="line">                b_1 = b - e_i - label_mat[i] * (alphas[i] - alpha_i_old) * data_matrix[i,:] * data_matrix[i,:].T -  label_mat[j] * (alphas[j] - alpha_j_old)* data_matrix[i,:] * data_matrix[j,:].T</span><br><span class="line">                </span><br><span class="line">                b_2 = b - e_j - label_mat[i] * (alphas[i] -alpha_i_old) * data_matrix[i,:] * data_matrix[j,:].T - label_mat[j] * (alphas[j] - alpha_j_old) * data_matrix[j,:] * data_matrix[j,:].T</span><br><span class="line">                <span class="keyword">if</span> (<span class="number">0</span> &lt;alphas[i]) <span class="keyword">and</span> (C &gt; alphas[i]): </span><br><span class="line">                    b = b_1</span><br><span class="line">                <span class="keyword">elif</span> (<span class="number">0</span> &lt; alphas[j]) <span class="keyword">and</span> (C &gt; alphas[j]):</span><br><span class="line">                    b = b_2</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    b = (b_1 + b_2) /<span class="number">2.0</span></span><br><span class="line">                alpha_pairs_chanaged += <span class="number">1</span></span><br><span class="line">                <span class="comment">#print('iter: %d i:%d,pairs changed %d'%(iter,i,alpha_pairs_chanaged))</span></span><br><span class="line">                <span class="comment">#print('alpha_i_old: %f, alpha_i_new: %f,alpha_j_old: %f, alpha_j_new: %f' %(alpha_i_old,alphas[i],alpha_j_old,alphas[j]))</span></span><br><span class="line">        print(<span class="string">"fullSet, iter: %d , pairs changed %d"</span> % (iter,alpha_pairs_chanaged))</span><br><span class="line">        <span class="keyword">if</span> (alpha_pairs_chanaged == <span class="number">0</span>):</span><br><span class="line">            iter += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            iter =<span class="number">0</span></span><br><span class="line">        print(<span class="string">'iteration number: %d'</span> % iter)</span><br><span class="line">    <span class="keyword">return</span> b,alphas</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b,alphas = smo_simple(data_arr,label_arr,<span class="number">0.6</span>,<span class="number">0.001</span>,<span class="number">10</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 7
+iteration number: 0
+fullSet, iter: 0 , pairs changed 4
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 6
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 0
+iteration number: 5
+fullSet, iter: 5 , pairs changed 0
+iteration number: 6
+fullSet, iter: 6 , pairs changed 0
+iteration number: 7
+fullSet, iter: 7 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 0
+iteration number: 5
+fullSet, iter: 5 , pairs changed 0
+iteration number: 6
+fullSet, iter: 6 , pairs changed 0
+iteration number: 7
+fullSet, iter: 7 , pairs changed 0
+iteration number: 8
+fullSet, iter: 8 , pairs changed 0
+iteration number: 9
+fullSet, iter: 9 , pairs changed 0
+iteration number: 10
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#边界上的样本对应的α_i=0或者α_i=C，在优化过程中很难变化，然而非边界样本0&lt;α_i&lt;C会随着对其他变量的优化会有大的变化</span></span><br><span class="line"><span class="keyword">from</span> numpy <span class="keyword">import</span> *</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">optStruct</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,dataMatIn, classLabels, C, toler)</span>:</span>  <span class="comment"># Initialize the structure with the parameters </span></span><br><span class="line">        self.X = dataMatIn</span><br><span class="line">        self.labelMat = classLabels</span><br><span class="line">        self.C = C</span><br><span class="line">        self.tol = toler</span><br><span class="line">        self.m = shape(dataMatIn)[<span class="number">0</span>]</span><br><span class="line">        self.alphas = mat(zeros((self.m,<span class="number">1</span>)))</span><br><span class="line">        self.b = <span class="number">0</span></span><br><span class="line">        self.eCache = mat(zeros((self.m,<span class="number">2</span>))) <span class="comment">#第一项储存是否有效</span></span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calcEk</span><span class="params">(oS, k)</span>:</span></span><br><span class="line">    fXk = float(multiply(oS.alphas,oS.labelMat).T*(oS.X*oS.X[k,:].T)) + oS.b</span><br><span class="line">    Ek = fXk - float(oS.labelMat[k])</span><br><span class="line">    <span class="keyword">return</span> Ek</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">selectJ</span><span class="params">(i, oS, Ei)</span>:</span>         <span class="comment">#this is the second choice -heurstic, and calcs Ej</span></span><br><span class="line">    maxK = <span class="number">-1</span>; maxDeltaE = <span class="number">0</span>; Ej = <span class="number">0</span></span><br><span class="line">    oS.eCache[i] = [<span class="number">1</span>,Ei]  <span class="comment">#set valid #choose the alpha that gives the maximum delta E</span></span><br><span class="line">    validEcacheList = nonzero(oS.eCache[:,<span class="number">0</span>].A)[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">if</span> (len(validEcacheList)) &gt; <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> validEcacheList:   <span class="comment">#loop through valid Ecache values and find the one that maximizes delta E</span></span><br><span class="line">            <span class="keyword">if</span> k == i: <span class="keyword">continue</span> <span class="comment">#don't calc for i, waste of time</span></span><br><span class="line">            Ek = calcEk(oS, k)</span><br><span class="line">            deltaE = abs(Ei - Ek)</span><br><span class="line">            <span class="keyword">if</span> (deltaE &gt; maxDeltaE):</span><br><span class="line">                maxK = k; maxDeltaE = deltaE; Ej = Ek</span><br><span class="line">        <span class="keyword">return</span> maxK, Ej</span><br><span class="line">    <span class="keyword">else</span>:   <span class="comment">#in this case (first time around) we don't have any valid eCache values</span></span><br><span class="line">        j = selectJrand(i, oS.m)</span><br><span class="line">        Ej = calcEk(oS, j)</span><br><span class="line">    <span class="keyword">return</span> j, Ej</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">updateEk</span><span class="params">(oS, k)</span>:</span><span class="comment">#after any alpha has changed update the new value in the cache</span></span><br><span class="line">    Ek = calcEk(oS, k)</span><br><span class="line">    oS.eCache[k] = [<span class="number">1</span>,Ek]</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">innerL</span><span class="params">(i, oS)</span>:</span></span><br><span class="line">    Ei = calcEk(oS, i)</span><br><span class="line">    <span class="comment">#判断是否可以优化，不可以直接返回0，</span></span><br><span class="line">    <span class="comment">#可以优化则搜索j，第一次是随机的，并且添加0到临时e表里，因为只有一个数值，所以随机选择j</span></span><br><span class="line">    <span class="comment">#之后更新alpah-i j对，更新i,j的e值，返回结果</span></span><br><span class="line">    <span class="comment">#第二次进入内训，i=1,添加1到临时表，j因为有两个所以选j=0，</span></span><br><span class="line">    <span class="comment">#一遍循环后临时e表都有了，之后就能按照alpah不是0的来选择最佳的j</span></span><br><span class="line">    <span class="keyword">if</span> ((oS.labelMat[i]*Ei &lt; -oS.tol) <span class="keyword">and</span> (oS.alphas[i] &lt; oS.C)) <span class="keyword">or</span> ((oS.labelMat[i]*Ei &gt; oS.tol) <span class="keyword">and</span> (oS.alphas[i] &gt; <span class="number">0</span>)):</span><br><span class="line">        j,Ej = selectJ(i, oS, Ei) <span class="comment">#this has been changed from selectJrand</span></span><br><span class="line">        alphaIold = oS.alphas[i].copy(); alphaJold = oS.alphas[j].copy();</span><br><span class="line">        <span class="keyword">if</span> (oS.labelMat[i] != oS.labelMat[j]):</span><br><span class="line">            L = max(<span class="number">0</span>, oS.alphas[j] - oS.alphas[i])</span><br><span class="line">            H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            L = max(<span class="number">0</span>, oS.alphas[j] + oS.alphas[i] - oS.C)</span><br><span class="line">            H = min(oS.C, oS.alphas[j] + oS.alphas[i])</span><br><span class="line">        <span class="keyword">if</span> L==H: </span><br><span class="line">            <span class="comment">#print("L==H")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        eta = <span class="number">2.0</span> * oS.X[i,:]*oS.X[j,:].T - oS.X[i,:]*oS.X[i,:].T - oS.X[j,:]*oS.X[j,:].T</span><br><span class="line">        <span class="keyword">if</span> eta &gt;= <span class="number">0</span>: </span><br><span class="line">            <span class="comment">#print("eta&gt;=0")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[j] -= oS.labelMat[j]*(Ei - Ej)/eta</span><br><span class="line">        oS.alphas[j] = clipAlpha(oS.alphas[j],H,L)</span><br><span class="line">        <span class="comment">#因为alpha_j改变了，所以需要重新计算，为什么不是一起更新</span></span><br><span class="line">        updateEk(oS, j) <span class="comment">#added this for the Ecache</span></span><br><span class="line">        <span class="keyword">if</span> (abs(oS.alphas[j] - alphaJold) &lt; <span class="number">0.00001</span>): </span><br><span class="line">            <span class="comment">#print("j not moving enough")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[i] += oS.labelMat[j]*oS.labelMat[i]*(alphaJold - oS.alphas[j])<span class="comment">#update i by the same amount as j</span></span><br><span class="line">        updateEk(oS, i) <span class="comment">#added this for the Ecache                    #the update is in the oppostie direction</span></span><br><span class="line">        b1 = oS.b - Ei- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.X[i,:]*oS.X[i,:].T - oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.X[i,:]*oS.X[j,:].T</span><br><span class="line">        b2 = oS.b - Ej- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.X[i,:]*oS.X[j,:].T - oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.X[j,:]*oS.X[j,:].T</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> &lt; oS.alphas[i]) <span class="keyword">and</span> (oS.C &gt; oS.alphas[i]): oS.b = b1</span><br><span class="line">        <span class="keyword">elif</span> (<span class="number">0</span> &lt; oS.alphas[j]) <span class="keyword">and</span> (oS.C &gt; oS.alphas[j]): oS.b = b2</span><br><span class="line">        <span class="keyword">else</span>: oS.b = (b1 + b2)/<span class="number">2.0</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">innerL1</span><span class="params">(i, oS)</span>:</span> <span class="comment">#一起更新临时e</span></span><br><span class="line">    Ei = calcEk(oS, i)</span><br><span class="line">    <span class="comment">#判断是否可以优化，不可以直接返回0，</span></span><br><span class="line">    <span class="comment">#可以优化则搜索j，第一次是随机的，并且添加0到临时e表里，因为只有一个数值，所以随机选择j</span></span><br><span class="line">    <span class="comment">#之后更新alpah-i j对，更新i,j的e值，返回结果</span></span><br><span class="line">    <span class="comment">#第二次进入内训，i=1,添加1到临时表，j因为有两个所以选j=0，</span></span><br><span class="line">    <span class="comment">#一遍循环后临时e表都有了，之后就能按照alpah不是0的来选择最佳的j</span></span><br><span class="line">    <span class="keyword">if</span> ((oS.labelMat[i]*Ei &lt; -oS.tol) <span class="keyword">and</span> (oS.alphas[i] &lt; oS.C)) <span class="keyword">or</span> ((oS.labelMat[i]*Ei &gt; oS.tol) <span class="keyword">and</span> (oS.alphas[i] &gt; <span class="number">0</span>)):</span><br><span class="line">        j,Ej = selectJ(i, oS, Ei) <span class="comment">#this has been changed from selectJrand</span></span><br><span class="line">        alphaIold = oS.alphas[i].copy(); alphaJold = oS.alphas[j].copy();</span><br><span class="line">        <span class="keyword">if</span> (oS.labelMat[i] != oS.labelMat[j]):</span><br><span class="line">            L = max(<span class="number">0</span>, oS.alphas[j] - oS.alphas[i])</span><br><span class="line">            H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            L = max(<span class="number">0</span>, oS.alphas[j] + oS.alphas[i] - oS.C)</span><br><span class="line">            H = min(oS.C, oS.alphas[j] + oS.alphas[i])</span><br><span class="line">        <span class="keyword">if</span> L==H: </span><br><span class="line">            <span class="comment">#print("L==H")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        eta = <span class="number">2.0</span> * oS.X[i,:]*oS.X[j,:].T - oS.X[i,:]*oS.X[i,:].T - oS.X[j,:]*oS.X[j,:].T</span><br><span class="line">        <span class="keyword">if</span> eta &gt;= <span class="number">0</span>: </span><br><span class="line">            <span class="comment">#print("eta&gt;=0"); </span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[j] -= oS.labelMat[j]*(Ei - Ej)/eta</span><br><span class="line">        oS.alphas[j] = clipAlpha(oS.alphas[j],H,L)</span><br><span class="line">        <span class="keyword">if</span> (abs(oS.alphas[j] - alphaJold) &lt; <span class="number">0.00001</span>): </span><br><span class="line">            <span class="comment">#print("j not moving enough")</span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[i] += oS.labelMat[j]*oS.labelMat[i]*(alphaJold - oS.alphas[j])<span class="comment">#update i by the same amount as j</span></span><br><span class="line">        updateEk(oS,j)</span><br><span class="line">        updateEk(oS, i) <span class="comment">#added this for the Ecache                    #the update is in the oppostie direction</span></span><br><span class="line">        b1 = oS.b - Ei- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.X[i,:]*oS.X[i,:].T - oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.X[i,:]*oS.X[j,:].T</span><br><span class="line">        b2 = oS.b - Ej- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.X[i,:]*oS.X[j,:].T - oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.X[j,:]*oS.X[j,:].T</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> &lt; oS.alphas[i]) <span class="keyword">and</span> (oS.C &gt; oS.alphas[i]): oS.b = b1</span><br><span class="line">        <span class="keyword">elif</span> (<span class="number">0</span> &lt; oS.alphas[j]) <span class="keyword">and</span> (oS.C &gt; oS.alphas[j]): oS.b = b2</span><br><span class="line">        <span class="keyword">else</span>: oS.b = (b1 + b2)/<span class="number">2.0</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">smoP</span><span class="params">(dataMatIn, classLabels, C, toler, maxIter)</span>:</span>    <span class="comment">#full Platt SMO</span></span><br><span class="line">    oS = optStruct(mat(dataMatIn),mat(classLabels).transpose(),C,toler)</span><br><span class="line">    iter = <span class="number">0</span></span><br><span class="line">    entireSet = <span class="literal">True</span>; alphaPairsChanged = <span class="number">0</span></span><br><span class="line">    <span class="comment">#当循环数不满时并且是循环整个数据集或者不是循环整个数据集但是有alpha对改变时</span></span><br><span class="line">    <span class="keyword">while</span> (iter &lt; maxIter) <span class="keyword">and</span> ((alphaPairsChanged &gt; <span class="number">0</span>) <span class="keyword">or</span> (entireSet)):</span><br><span class="line">        alphaPairsChanged = <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> entireSet:   <span class="comment">#go over all</span></span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(oS.m):        </span><br><span class="line">                alphaPairsChanged += innerL(i,oS)</span><br><span class="line">                <span class="comment">#print("fullSet, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged))</span></span><br><span class="line">            print(<span class="string">"fullSet, iter: %d , pairs changed %d"</span> % (iter,alphaPairsChanged))</span><br><span class="line">            iter += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:<span class="comment">#go over non-bound (railed) alphas</span></span><br><span class="line">            nonBoundIs = nonzero((oS.alphas.A &gt; <span class="number">0</span>) * (oS.alphas.A &lt; C))[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> nonBoundIs:</span><br><span class="line">                alphaPairsChanged += innerL(i,oS)</span><br><span class="line">                <span class="comment">#print("non-bound, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged))</span></span><br><span class="line">            print(<span class="string">"non-bound, iter: %d , pairs changed %d"</span> % (iter,alphaPairsChanged))</span><br><span class="line">            iter += <span class="number">1</span></span><br><span class="line">        <span class="comment">#第一次循环为整个，循环后改变为循环non-bound，如果没有a对改变，则变成整个的数据集</span></span><br><span class="line">        <span class="comment">#在整个数据集循环后没有a对改变时，跳出循环，结束</span></span><br><span class="line">        <span class="keyword">if</span> entireSet: entireSet = <span class="literal">False</span> <span class="comment">#toggle entire set loop</span></span><br><span class="line">        <span class="keyword">elif</span> (alphaPairsChanged == <span class="number">0</span>): entireSet = <span class="literal">True</span>  </span><br><span class="line">        print(<span class="string">"iteration number: %d"</span> % iter)</span><br><span class="line">    <span class="keyword">return</span> oS.b,oS.alphas</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data_arr, label_arr = loadDataset(<span class="string">'../../Downloads/machinelearninginaction/Ch06/testSet.txt'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b, alphas = smoP(data_arr,label_arr,<span class="number">0.6</span>,<span class="number">0.001</span>,<span class="number">40</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 6
+iteration number: 1
+non-bound, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+</code></pre><p>$w = \sum\limits_{i=1}^m\alpha_iy_ix_i$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#计算w值</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calc_ws</span><span class="params">(alphas,data_arr,class_labels)</span>:</span></span><br><span class="line">    x = np.mat(data_arr)</span><br><span class="line">    label_mat = np.mat(class_labels).transpose()</span><br><span class="line">    m,n = np.shape(x)</span><br><span class="line">    w = np.zeros((n,<span class="number">1</span>))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        w += np.multiply(alphas[i] * label_mat[i], x[i,:].T)</span><br><span class="line">    <span class="keyword">return</span> w</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calc_ws</span><span class="params">(alphas,data_arr,class_labels)</span>:</span></span><br><span class="line">    <span class="comment">#向量来求解</span></span><br><span class="line">    x = np.mat(data_arr);label_mat = np.mat(class_labels).T</span><br><span class="line">    w = x.T * np.multiply(alphas,label_mat) </span><br><span class="line">    <span class="keyword">return</span> w</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">calc_ws(alphas,data_arr,label_arr)</span><br></pre></td></tr></table></figure>
+<pre><code>matrix([[ 0.65307162],
+        [-0.17196128]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">calc_ws(alphas,data_arr,label_arr)</span><br></pre></td></tr></table></figure>
+<pre><code>matrix([[ 0.65307162],
+        [-0.17196128]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#绘制样本</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">showClassifer</span><span class="params">(dataMat, w, b)</span>:</span></span><br><span class="line">    <span class="comment">#绘制样本点</span></span><br><span class="line">    data_plus = []                                  <span class="comment">#正样本</span></span><br><span class="line">    data_minus = []                                 <span class="comment">#负样本</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(dataMat)):</span><br><span class="line">        <span class="keyword">if</span> label_arr[i] &gt; <span class="number">0</span>:</span><br><span class="line">            data_plus.append(dataMat[i])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            data_minus.append(dataMat[i])</span><br><span class="line">    data_plus_np = np.array(data_plus)              <span class="comment">#转换为numpy矩阵</span></span><br><span class="line">    data_minus_np = np.array(data_minus)            <span class="comment">#转换为numpy矩阵</span></span><br><span class="line">    plt.scatter(np.transpose(data_plus_np)[<span class="number">0</span>], np.transpose(data_plus_np)[<span class="number">1</span>], s=<span class="number">30</span>, alpha=<span class="number">0.7</span>)   <span class="comment">#正样本散点图</span></span><br><span class="line">    plt.scatter(np.transpose(data_minus_np)[<span class="number">0</span>], np.transpose(data_minus_np)[<span class="number">1</span>], s=<span class="number">30</span>, alpha=<span class="number">0.7</span>) <span class="comment">#负样本散点图</span></span><br><span class="line">    <span class="comment">#绘制直线</span></span><br><span class="line">    x1 = max(dataMat)[<span class="number">0</span>]</span><br><span class="line">    x2 = min(dataMat)[<span class="number">0</span>]</span><br><span class="line">    a1, a2 = w</span><br><span class="line">    b = float(b)</span><br><span class="line">    a1 = float(a1[<span class="number">0</span>])</span><br><span class="line">    a2 = float(a2[<span class="number">0</span>])</span><br><span class="line">    y1, y2 = (-b- a1*x1)/a2, (-b - a1*x2)/a2</span><br><span class="line">    plt.plot([x1, x2], [y1, y2])</span><br><span class="line">    <span class="comment">#找出支持向量点</span></span><br><span class="line">    <span class="keyword">for</span> i, alpha <span class="keyword">in</span> enumerate(alphas):</span><br><span class="line">        <span class="keyword">if</span> abs(alpha) &gt; <span class="number">0</span>:</span><br><span class="line">            x, y = dataMat[i]</span><br><span class="line">            plt.scatter([x], [y], s=<span class="number">150</span>, c=<span class="string">'none'</span>, alpha=<span class="number">0.7</span>, linewidth=<span class="number">1.5</span>, edgecolor=<span class="string">'red'</span>)</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> matplotlib <span class="keyword">import</span> pylab <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
+<p>c越高，说明越不能容忍出现误差,容易过拟合。C越小，容易欠拟合。C过大或过小，泛化能力变差</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">b, alphas = smo_simple(data_arr,label_arr,<span class="number">0.6</span>,<span class="number">0.001</span>,<span class="number">10</span>)</span><br><span class="line">ws = calc_ws(alphas,data_arr,label_arr)</span><br><span class="line">showClassifer(data_arr,ws,b)</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 3
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 4
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 3
+iteration number: 0
+fullSet, iter: 0 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 4
+iteration number: 0
+fullSet, iter: 0 , pairs changed 3
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 3
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 2
+iteration number: 0
+fullSet, iter: 0 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 0
+iteration number: 5
+fullSet, iter: 5 , pairs changed 0
+iteration number: 6
+fullSet, iter: 6 , pairs changed 0
+iteration number: 7
+fullSet, iter: 7 , pairs changed 0
+iteration number: 8
+fullSet, iter: 8 , pairs changed 0
+iteration number: 9
+fullSet, iter: 9 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 0
+iteration number: 5
+fullSet, iter: 5 , pairs changed 0
+iteration number: 6
+fullSet, iter: 6 , pairs changed 1
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 3
+iteration number: 0
+fullSet, iter: 0 , pairs changed 0
+iteration number: 1
+fullSet, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 0
+iteration number: 5
+fullSet, iter: 5 , pairs changed 0
+iteration number: 6
+fullSet, iter: 6 , pairs changed 0
+iteration number: 7
+fullSet, iter: 7 , pairs changed 0
+iteration number: 8
+fullSet, iter: 8 , pairs changed 0
+iteration number: 9
+fullSet, iter: 9 , pairs changed 0
+iteration number: 10
+</code></pre><p><img src="/public/pic/output_55_1.png" alt="png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">b, alphas = smoP(data_arr,label_arr,<span class="number">0.6</span>,<span class="number">0.001</span>,<span class="number">40</span>)</span><br><span class="line">ws = calc_ws(alphas,data_arr,label_arr)</span><br><span class="line">showClassifer(data_arr,ws,b)</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 6
+iteration number: 1
+non-bound, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+</code></pre><p><img src="/public/pic/output_56_1.png" alt="png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">b, alphas = smoP(data_arr,label_arr,<span class="number">0.01</span>,<span class="number">0.001</span>,<span class="number">40</span>)</span><br><span class="line">ws = calc_ws(alphas,data_arr,label_arr)</span><br><span class="line">showClassifer(data_arr,ws,b)</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 10
+iteration number: 1
+non-bound, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+</code></pre><p><img src="/public/pic/output_57_1.png" alt="png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">b, alphas = smoP(data_arr,label_arr,<span class="number">55</span>,<span class="number">0.001</span>,<span class="number">40</span>)</span><br><span class="line">ws = calc_ws(alphas,data_arr,label_arr)</span><br><span class="line">showClassifer(data_arr,ws,b)</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 8
+iteration number: 1
+non-bound, iter: 1 , pairs changed 0
+iteration number: 2
+fullSet, iter: 2 , pairs changed 0
+iteration number: 3
+</code></pre><p><img src="/public/pic/output_58_1.png" alt="png"></p>
+<p>核函数<br>径向基核函数<br>$k(x,y) = exp(\frac{-||x -y||^2}{2\sigma^2})$</p>
+<p>自变量为向量，可以计算自变量相对于(0,0)或者其他的向量距离</p>
+<p>$\sigma$为到达率(reach)或者函数值跌落到0的速度参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#转换核函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">kernelTrans</span><span class="params">(X,A,kTup)</span>:</span></span><br><span class="line">    <span class="string">"""X为整个数据集，A为其中一行，计算A行和整个数据集的核函数内积</span></span><br><span class="line"><span class="string">        如果是线性，的则直接得到x * xi^T</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    m,n = shape(X)</span><br><span class="line">    K = np.mat(np.zeros((m,<span class="number">1</span>)))</span><br><span class="line">    <span class="keyword">if</span> kTup[<span class="number">0</span>] == <span class="string">'lin'</span>:</span><br><span class="line">        K = X * A.T <span class="comment">#数据集i列的内积 (m,n) * (n,1) =&gt; (m,1)</span></span><br><span class="line">    <span class="keyword">elif</span> kTup[<span class="number">0</span>] == <span class="string">'rbf'</span>:</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(m): <span class="comment">#读取第j行的值,x </span></span><br><span class="line">            deltaRow = X[j,:]  -A <span class="comment">#j行减去i行的差，x-y (1,n)</span></span><br><span class="line">            K[j] = deltaRow * deltaRow.T <span class="comment">#得到L2反数</span></span><br><span class="line">        K = exp(K / (<span class="number">-1</span> * kTup[<span class="number">1</span>] ** <span class="number">2</span>)) <span class="comment">#各值计算得到和函数的值,k有m行</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> NameError(<span class="string">'Houston we have a problem --That Kernel is not recognized'</span>)</span><br><span class="line">    <span class="keyword">return</span> K</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">optStructk</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,dataMatIn, classLabels, C, toler, kTup)</span>:</span>  <span class="comment"># Initialize the structure with the parameters </span></span><br><span class="line">        self.X = dataMatIn</span><br><span class="line">        self.labelMat = classLabels</span><br><span class="line">        self.C = C</span><br><span class="line">        self.tol = toler</span><br><span class="line">        self.m = shape(dataMatIn)[<span class="number">0</span>]</span><br><span class="line">        self.alphas = mat(zeros((self.m,<span class="number">1</span>)))</span><br><span class="line">        self.b = <span class="number">0</span></span><br><span class="line">        self.eCache = mat(zeros((self.m,<span class="number">2</span>))) <span class="comment">#first column is valid flag</span></span><br><span class="line">        <span class="comment">#K为i,j的内积</span></span><br><span class="line">        self.K = mat(zeros((self.m,self.m)))</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(self.m):</span><br><span class="line">            <span class="comment">#得到第i列的值即y</span></span><br><span class="line">            self.K[:,i] = kernelTrans(self.X, self.X[i,:], kTup)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#修改用到核函数的辅助函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">calcEk</span><span class="params">(oS, k)</span>:</span></span><br><span class="line">    fXk = float(multiply(oS.alphas,oS.labelMat).T*oS.K[:,k] + oS.b)</span><br><span class="line">    Ek = fXk - float(oS.labelMat[k])</span><br><span class="line">    <span class="keyword">return</span> Ek</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">innerLk</span><span class="params">(i, oS)</span>:</span></span><br><span class="line">    Ei = calcEk(oS, i)</span><br><span class="line">    <span class="keyword">if</span> ((oS.labelMat[i]*Ei &lt; -oS.tol) <span class="keyword">and</span> (oS.alphas[i] &lt; oS.C)) <span class="keyword">or</span> ((oS.labelMat[i]*Ei &gt; oS.tol) <span class="keyword">and</span> (oS.alphas[i] &gt; <span class="number">0</span>)):</span><br><span class="line">        j,Ej = selectJ(i, oS, Ei) <span class="comment">#this has been changed from selectJrand</span></span><br><span class="line">        alphaIold = oS.alphas[i].copy(); alphaJold = oS.alphas[j].copy();</span><br><span class="line">        <span class="keyword">if</span> (oS.labelMat[i] != oS.labelMat[j]):</span><br><span class="line">            L = max(<span class="number">0</span>, oS.alphas[j] - oS.alphas[i])</span><br><span class="line">            H = min(oS.C, oS.C + oS.alphas[j] - oS.alphas[i])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            L = max(<span class="number">0</span>, oS.alphas[j] + oS.alphas[i] - oS.C)</span><br><span class="line">            H = min(oS.C, oS.alphas[j] + oS.alphas[i])</span><br><span class="line">        <span class="keyword">if</span> L==H: </span><br><span class="line">            <span class="comment">#print("L==H"); </span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        eta = <span class="number">2.0</span> * oS.K[i,j] - oS.K[i,i] - oS.K[j,j] <span class="comment">#changed for kernel</span></span><br><span class="line">        <span class="keyword">if</span> eta &gt;= <span class="number">0</span>: </span><br><span class="line">            <span class="comment">#print("eta&gt;=0"); </span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[j] -= oS.labelMat[j]*(Ei - Ej)/eta</span><br><span class="line">        oS.alphas[j] = clipAlpha(oS.alphas[j],H,L)</span><br><span class="line">        updateEk(oS, j) <span class="comment">#added this for the Ecache</span></span><br><span class="line">        <span class="keyword">if</span> (abs(oS.alphas[j] - alphaJold) &lt; <span class="number">0.00001</span>):</span><br><span class="line">            <span class="comment">#print("j not moving enough"); </span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        oS.alphas[i] += oS.labelMat[j]*oS.labelMat[i]*(alphaJold - oS.alphas[j])<span class="comment">#update i by the same amount as j</span></span><br><span class="line">        updateEk(oS, i) <span class="comment">#added this for the Ecache                    #the update is in the oppostie direction</span></span><br><span class="line">        b1 = oS.b - Ei- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.K[i,i] - oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.K[i,j]</span><br><span class="line">        b2 = oS.b - Ej- oS.labelMat[i]*(oS.alphas[i]-alphaIold)*oS.K[i,j]- oS.labelMat[j]*(oS.alphas[j]-alphaJold)*oS.K[j,j]</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> &lt; oS.alphas[i]) <span class="keyword">and</span> (oS.C &gt; oS.alphas[i]): oS.b = b1</span><br><span class="line">        <span class="keyword">elif</span> (<span class="number">0</span> &lt; oS.alphas[j]) <span class="keyword">and</span> (oS.C &gt; oS.alphas[j]): oS.b = b2</span><br><span class="line">        <span class="keyword">else</span>: oS.b = (b1 + b2)/<span class="number">2.0</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>: <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">smoPk</span><span class="params">(dataMatIn, classLabels, C, toler, maxIter,kTup=<span class="params">(<span class="string">'lin'</span>, <span class="number">0</span>)</span>)</span>:</span>    <span class="comment">#full Platt SMO</span></span><br><span class="line">    oS = optStructk(mat(dataMatIn),mat(classLabels).transpose(),C,toler, kTup)</span><br><span class="line">    iter = <span class="number">0</span></span><br><span class="line">    entireSet = <span class="literal">True</span>; alphaPairsChanged = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> (iter &lt; maxIter) <span class="keyword">and</span> ((alphaPairsChanged &gt; <span class="number">0</span>) <span class="keyword">or</span> (entireSet)):</span><br><span class="line">        alphaPairsChanged = <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> entireSet:   <span class="comment">#go over all</span></span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(oS.m):        </span><br><span class="line">                alphaPairsChanged += innerLk(i,oS)</span><br><span class="line">                <span class="comment">#print("fullSet, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged))</span></span><br><span class="line">            print(<span class="string">"fullSet, iter: %d , pairs changed %d"</span> % (iter,alphaPairsChanged))</span><br><span class="line">            iter += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:<span class="comment">#go over non-bound (railed) alphas</span></span><br><span class="line">            nonBoundIs = nonzero((oS.alphas.A &gt; <span class="number">0</span>) * (oS.alphas.A &lt; C))[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> nonBoundIs:</span><br><span class="line">                alphaPairsChanged += innerLk(i,oS)</span><br><span class="line">                <span class="comment">#print("non-bound, iter: %d i:%d, pairs changed %d" % (iter,i,alphaPairsChanged))</span></span><br><span class="line">            print(<span class="string">"non-bound, iter: %d , pairs changed %d"</span> % (iter,alphaPairsChanged))</span><br><span class="line">            iter += <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> entireSet: entireSet = <span class="literal">False</span> <span class="comment">#toggle entire set loop</span></span><br><span class="line">        <span class="keyword">elif</span> (alphaPairsChanged == <span class="number">0</span>): entireSet = <span class="literal">True</span>  </span><br><span class="line">        print(<span class="string">"iteration number: %d"</span> % iter)</span><br><span class="line">    <span class="keyword">return</span> oS.b,oS.alphas</span><br></pre></td></tr></table></figure>
+<p>$f(x) = \sum\limits_{i=1}^m\alpha_i^*y_iK(x\cdot x_i) + b^*$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">testRbf</span><span class="params">(k1=<span class="number">1.3</span>)</span>:</span></span><br><span class="line">    dataArr,labelArr = loadDataset(<span class="string">'../../Downloads/machinelearninginaction/Ch06/testSetRBF.txt'</span>)</span><br><span class="line">    b,alphas = smoPk(dataArr, labelArr, <span class="number">200</span>, <span class="number">0.0001</span>, <span class="number">10000</span>, (<span class="string">'rbf'</span>, k1)) <span class="comment">#C=200 important</span></span><br><span class="line">    datMat=mat(dataArr); labelMat = mat(labelArr).transpose()</span><br><span class="line">    <span class="comment">#得到支持向量的索引</span></span><br><span class="line">    svInd=nonzero(alphas.A&gt;<span class="number">0</span>)[<span class="number">0</span>] <span class="comment">#[0]是因为alphas是一个mat，[1]是都是0的array</span></span><br><span class="line">    sVs=datMat[svInd] <span class="comment">#get matrix of only support vectors</span></span><br><span class="line">    labelSV = labelMat[svInd];</span><br><span class="line">    print(<span class="string">"there are %d Support Vectors"</span> % shape(sVs)[<span class="number">0</span>])</span><br><span class="line">    m,n = shape(datMat)</span><br><span class="line">    errorCount = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        <span class="comment">#除了支持向量的a都是0，只需要计算支持向量的核函数</span></span><br><span class="line">        kernelEval = kernelTrans(sVs,datMat[i,:],(<span class="string">'rbf'</span>, k1)) <span class="comment">#计算支持向量与数据的和函数，(shape(sVs)[0],1)     </span></span><br><span class="line">        predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b <span class="comment">#(1,i) * (i,1) =&gt;(1,1)</span></span><br><span class="line">        <span class="keyword">if</span> sign(predict)!=sign(labelArr[i]): errorCount += <span class="number">1</span></span><br><span class="line">    print(<span class="string">"the training error rate is: %f"</span> % (float(errorCount)/m))</span><br><span class="line">    dataArr,labelArr = loadDataset(<span class="string">'../../Downloads/machinelearninginaction/Ch06/testSetRBF2.txt'</span>)</span><br><span class="line">    errorCount = <span class="number">0</span></span><br><span class="line">    datMat=mat(dataArr); labelMat = mat(labelArr).transpose()</span><br><span class="line">    m,n = shape(datMat)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        kernelEval = kernelTrans(sVs,datMat[i,:],(<span class="string">'rbf'</span>, k1))</span><br><span class="line">        predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b</span><br><span class="line">        <span class="keyword">if</span> sign(predict)!=sign(labelArr[i]): errorCount += <span class="number">1</span>    </span><br><span class="line">    print(<span class="string">"the test error rate is: %f"</span> % (float(errorCount)/m) )</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">testRbf()</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 30
+iteration number: 1
+non-bound, iter: 1 , pairs changed 5
+iteration number: 2
+non-bound, iter: 2 , pairs changed 2
+iteration number: 3
+non-bound, iter: 3 , pairs changed 0
+iteration number: 4
+fullSet, iter: 4 , pairs changed 0
+iteration number: 5
+there are 29 Support Vectors
+the training error rate is: 0.130000
+the test error rate is: 0.150000
+</code></pre><p>$\sigma$ 如果太小，会得到很多支持向量，因为各支持向量的影响会变小，所以需要更多支持向量，但是容易过拟合</p>
+<p>$\sigma $如果过大，则支持向量变小，容易欠拟合</p>
+<h3 id="手写识别问题回顾"><a href="#手写识别问题回顾" class="headerlink" title="手写识别问题回顾"></a>手写识别问题回顾</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">img2vector</span><span class="params">(filename)</span>:</span></span><br><span class="line">    returnVect = zeros((<span class="number">1</span>,<span class="number">1024</span>))</span><br><span class="line">    fr = open(filename)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">32</span>):</span><br><span class="line">        lineStr = fr.readline()</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">32</span>):</span><br><span class="line">            returnVect[<span class="number">0</span>,<span class="number">32</span>*i+j] = int(lineStr[j])</span><br><span class="line">    <span class="keyword">return</span> returnVect</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loadImages</span><span class="params">(dirName)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> os <span class="keyword">import</span> listdir</span><br><span class="line">    hwLabels = []</span><br><span class="line">    trainingFileList = listdir(dirName)           <span class="comment">#load the training set</span></span><br><span class="line">    m = len(trainingFileList)</span><br><span class="line">    trainingMat = zeros((m,<span class="number">1024</span>))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        fileNameStr = trainingFileList[i]</span><br><span class="line">        fileStr = fileNameStr.split(<span class="string">'.'</span>)[<span class="number">0</span>]     <span class="comment">#take off .txt</span></span><br><span class="line">        classNumStr = int(fileStr.split(<span class="string">'_'</span>)[<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">if</span> classNumStr == <span class="number">9</span>: hwLabels.append(<span class="number">-1</span>)</span><br><span class="line">        <span class="keyword">else</span>: hwLabels.append(<span class="number">1</span>)</span><br><span class="line">        trainingMat[i,:] = img2vector(<span class="string">'%s/%s'</span> % (dirName, fileNameStr))</span><br><span class="line">    <span class="keyword">return</span> trainingMat, hwLabels    </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">testDigits</span><span class="params">(kTup=<span class="params">(<span class="string">'rbf'</span>, <span class="number">10</span>)</span>)</span>:</span></span><br><span class="line">    dataArr,labelArr = loadImages(<span class="string">'../../Downloads/machinelearninginaction/Ch06/digits/trainingDigits'</span>)</span><br><span class="line">    b,alphas = smoPk(dataArr, labelArr, <span class="number">200</span>, <span class="number">0.0001</span>, <span class="number">10000</span>, kTup)</span><br><span class="line">    datMat=mat(dataArr); labelMat = mat(labelArr).transpose()</span><br><span class="line">    svInd=nonzero(alphas.A&gt;<span class="number">0</span>)[<span class="number">0</span>]</span><br><span class="line">    sVs=datMat[svInd] </span><br><span class="line">    labelSV = labelMat[svInd];</span><br><span class="line">    print(<span class="string">"there are %d Support Vectors"</span> % shape(sVs)[<span class="number">0</span>])</span><br><span class="line">    m,n = shape(datMat)</span><br><span class="line">    errorCount = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        kernelEval = kernelTrans(sVs,datMat[i,:],kTup)</span><br><span class="line">        predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b</span><br><span class="line">        <span class="keyword">if</span> sign(predict)!=sign(labelArr[i]): errorCount += <span class="number">1</span></span><br><span class="line">    print(<span class="string">"the training error rate is: %f"</span> % (float(errorCount)/m))</span><br><span class="line">    dataArr,labelArr = loadImages(<span class="string">'../../Downloads/machinelearninginaction/Ch06/digits/testDigits'</span>)</span><br><span class="line">    errorCount = <span class="number">0</span></span><br><span class="line">    datMat=mat(dataArr); labelMat = mat(labelArr).transpose()</span><br><span class="line">    m,n = shape(datMat)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        kernelEval = kernelTrans(sVs,datMat[i,:],kTup)</span><br><span class="line">        predict=kernelEval.T * multiply(labelSV,alphas[svInd]) + b</span><br><span class="line">        <span class="keyword">if</span> sign(predict)!=sign(labelArr[i]): errorCount += <span class="number">1</span>    </span><br><span class="line">    print(<span class="string">"the test error rate is: %f"</span> % (float(errorCount)/m))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">testDigits()</span><br></pre></td></tr></table></figure>
+<pre><code>fullSet, iter: 0 , pairs changed 104
+iteration number: 1
+non-bound, iter: 1 , pairs changed 11
+iteration number: 2
+non-bound, iter: 2 , pairs changed 0
+iteration number: 3
+fullSet, iter: 3 , pairs changed 0
+iteration number: 4
+there are 115 Support Vectors
+the training error rate is: 0.000000
+the test error rate is: 0.016129
+</code></pre>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+          
+            <a href="/tags/svm/" rel="tag"># svm</a>
+          
+            <a href="/tags/Data-Science/" rel="tag"># Data Science</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/06/pandas-axis/" rel="next" title="pandas-axis">
+                <i class="fa fa-chevron-left"></i> pandas-axis
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/10/hello-world/" rel="prev" title="Hello World">
+                Hello World <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yueyec</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#支持向量机"><span class="nav-number">1.</span> <span class="nav-text">支持向量机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SMO内容"><span class="nav-number">1.1.</span> <span class="nav-text">SMO内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#alpha-的部分"><span class="nav-number">1.1.1.</span> <span class="nav-text">$\alpha$的部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b的部分"><span class="nav-number">1.1.2.</span> <span class="nav-text">b的部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SMO计算梳理"><span class="nav-number">1.1.3.</span> <span class="nav-text">SMO计算梳理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手写识别问题回顾"><span class="nav-number">1.1.4.</span> <span class="nav-text">手写识别问题回顾</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yueyec</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

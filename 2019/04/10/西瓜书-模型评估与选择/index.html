@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="machine learning,Data Science,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="模型评估与选择2.1经验误差与过拟合经验误差(empirical error)为训练误差(training error)，即在训练集上得到的误差，在新样本上的误差为泛化误差(generalization error) 当学习器把训练样本学习的太好时，会产生过拟合(overfitting)，于此相对的是欠拟合(underfitting)即对训练样本的一般性质上尚未学好 过拟合最常见的情况是学习能力过">
+<meta name="keywords" content="machine learning,Data Science">
+<meta property="og:type" content="article">
+<meta property="og:title" content="西瓜书 模型评估与选择">
+<meta property="og:url" content="https://yueyec.github.io/2019/04/10/西瓜书-模型评估与选择/index.html">
+<meta property="og:site_name" content="Yueyec&#39;s Blog">
+<meta property="og:description" content="模型评估与选择2.1经验误差与过拟合经验误差(empirical error)为训练误差(training error)，即在训练集上得到的误差，在新样本上的误差为泛化误差(generalization error) 当学习器把训练样本学习的太好时，会产生过拟合(overfitting)，于此相对的是欠拟合(underfitting)即对训练样本的一般性质上尚未学好 过拟合最常见的情况是学习能力过">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://yueyec.github.io/public/pic/output_27_1.png">
+<meta property="og:image" content="https://yueyec.github.io/public/pic/output_28_1.png">
+<meta property="og:updated_time" content="2019-04-11T14:04:16.639Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="西瓜书 模型评估与选择">
+<meta name="twitter:description" content="模型评估与选择2.1经验误差与过拟合经验误差(empirical error)为训练误差(training error)，即在训练集上得到的误差，在新样本上的误差为泛化误差(generalization error) 当学习器把训练样本学习的太好时，会产生过拟合(overfitting)，于此相对的是欠拟合(underfitting)即对训练样本的一般性质上尚未学好 过拟合最常见的情况是学习能力过">
+<meta name="twitter:image" content="https://yueyec.github.io/public/pic/output_27_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yueyec.github.io/2019/04/10/西瓜书-模型评估与选择/">
+
+
+
+
+
+  <title>西瓜书 模型评估与选择 | Yueyec's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yueyec's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yueyec.github.io/2019/04/10/西瓜书-模型评估与选择/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yueyec">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yueyec's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">西瓜书 模型评估与选择</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-10T21:49:23+08:00">
+                2019-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Data-Science/" itemprop="url" rel="index">
+                    <span itemprop="name">Data Science</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="模型评估与选择"><a href="#模型评估与选择" class="headerlink" title="模型评估与选择"></a>模型评估与选择</h1><h2 id="2-1经验误差与过拟合"><a href="#2-1经验误差与过拟合" class="headerlink" title="2.1经验误差与过拟合"></a>2.1经验误差与过拟合</h2><p>经验误差(empirical error)为训练误差(training error)，即在训练集上得到的误差，<br>在新样本上的误差为泛化误差(generalization error)</p>
+<p>当学习器把训练样本学习的太好时，会产生过拟合(overfitting)，于此相对的是欠拟合(underfitting)即对训练样本的一般性质上尚未学好</p>
+<p>过拟合最常见的情况是学习能力过于强大，以至于把训练样本所有的不太一般的性质也学会了，而欠拟合通常是由于学习能力低下导致的</p>
+<p>因为数据的不确定和不准确性，所以没法得到一个完全正确的模型，所以过拟合不可避免。即因为数据的随机性和其他原因，经验误差等于0，但是泛化误差也等于0的情况基本上是不存在的</p>
+<h2 id="2-2-评估方法"><a href="#2-2-评估方法" class="headerlink" title="2.2 评估方法"></a>2.2 评估方法</h2><p>通过实验来得到的泛化误差来评估并进行选择<br>通常需要一个测试集(testing set)来测试学习器对新样本的判断能力，用测试误差(testing error)作为泛化误差的一个近似</p>
+<p>对于一个m个样本的数据集D，得到一份训练集S和一份测试集T</p>
+<h3 id="2-2-1-留出法"><a href="#2-2-1-留出法" class="headerlink" title="2.2.1 留出法"></a>2.2.1 留出法</h3><p>即将数据集分成两份数据集，当做测试集和训练集，这两个数据集的样本都不一样</p>
+<p>需要注意的是S和T的分布需要一致，避免划分是引入额外的误差，列如分类中，各分类的比例保持一致</p>
+<p>从采样(sampling)的角度就是分层采样(stratified sampling)，即按照类别分别采集相同比例的样本</p>
+<p>假设D有三个类别，分别占有4，4，2的比例，那假设训练样本抽取80%的数据，则对于占40%的class1取其中的80%，同理对其他的类别</p>
+<p>但是留出法得到的结果往往不稳定，因为根据采样的方法不同，得到的D,T样本也不同，因为如果对D进行排序，则取前面的80%数据和取后面80%的数据，得到的不一样，<br>一般采用若干次随机划分、重复进行实验评估后取平均值</p>
+<p>但是实际是评估数据集D训练出来的学习器性能，所以常用的比例大约是2/3到4/5的数据用于当做训练集，来保证能尽可能接近于训练集D的分类器，但是又有一定数据来评估，得到较准确的评估值</p>
+<h3 id="2-2-2-交叉验证法"><a href="#2-2-2-交叉验证法" class="headerlink" title="2.2.2 交叉验证法"></a>2.2.2 交叉验证法</h3><p>将数据集D划分为k个大小类似的互斥子集，每个子集都能保持一样的数据分布，也就是用了分层采样得到。</p>
+<p>将k-1个子集当做训练集，1个当做测试集，那就能得到k个评估，取平均值作为整体的评估结果。<br>常用的k值为10，也就是k-折交叉验证，其他常用的k值为5，20。</p>
+<p>其中如果将k定为m,则测试集只是其中一个样本，叫做留一法，这样可以保证得到的学习器可以和D训练出来的近似一致，<br>但是没法保证得到的估计结果会比其他评估方法好，并且计算量太大</p>
+<h3 id="2-2-3-自助法"><a href="#2-2-3-自助法" class="headerlink" title="2.2.3 自助法"></a>2.2.3 自助法</h3><p>上面的方法因为都划分了一部分当成测试集，导致实际学习器训练的数据比实际数据D小，所以必然引入了一些因训练样本规模不一样导致的估计偏差，留一法虽然影响较小，但是计算量提高了。</p>
+<p>为了解决训练规模的影响，可使用自助法</p>
+<p>自助法(bosststrapping)是以自助采样法(boostrap sampling)为基础，给定m个数据集D，对D进行采样产生数据集D’,然后在将该样本放回D中，使得样本在下次采样中可以被采集到,就是放回的采样；重复m次后，得到了m个样本的数据D’；就是对数据D进行放回采样，每次采集m个样本。</p>
+<p>这样样本D’的数据规模和原本的一样，并且因为有些数据被重复抽到导致一部分的数据并没有包括</p>
+<p>数据在m次采样中始终不包括的概率是$(1-\frac{1}{m})^m$,取极限得到</p>
+<script type="math/tex; mode=display">\lim_{m\to \infty}(1 - \frac{1}{m})^m = \frac{1}{e}\approx 0.368</script><p>即通过自助法，还有大概36.8%的样本没有被抽到，可以用D’做训练集，D\D’当测试集，这样的测试结果为包外估计(out-of-bag estimate)<br>自助法在数据集较小、难以有效划分训练集/测试集时很有效；此外，自助法能从初试数据集中产生不同的训练集，对集成学习等方法有很大的好处，但是因为改变了原本数据的分布，所以引入了估计偏差。因此在初试数据量足够时，留出法和交叉验证法较为常用</p>
+<h3 id="2-2-4-调参和最终模型"><a href="#2-2-4-调参和最终模型" class="headerlink" title="2.2.4 调参和最终模型"></a>2.2.4 调参和最终模型</h3><p>大部分的算法都有参数(parameter)需要设置，除了对模型算法进行选择，还需要对算法参数进行设置，叫做参数调节即调参(parameter tuning)<br>许多参数都是在一个范围内选择的，参数往往不是最佳的，这是在计算开销和性能估计做的折中选择。<br>通常得到的最终模型还需要对整个训练进行训练，用的就是得到的最佳参数和算法模型，因为在之前得到的模型和算法参数都是根据部分数据集训练得到的。<br>为了和最终测试的测试集加以区分，训练数据中来估计的数据集称之为验证集(validation set)</p>
+<h2 id="2-3-性能度量"><a href="#2-3-性能度量" class="headerlink" title="2.3 性能度量"></a>2.3 性能度量</h2><p>除了实验估计方法还需要衡量模型泛化能力的评价标准，就是性能度量(performace measure)。在任务需求下，使用不同的性能度量，可以得到不同的结果。所以模型的好坏除了算法和数据，还取决于任务需求。<br>回归任务最常用的性能度量是 均方误差(mean squared error)</p>
+<script type="math/tex; mode=display">E(f;D) = \frac{1}{m}\sum_{i=1}^m(f(x_i)-y_i)^2</script><p>更一般的，对于数据分布$\mathcal{D}$和概率密度函数$\mathcal{p}(\cdot)$，均方误差可描述为</p>
+<script type="math/tex; mode=display">E(f;\mathcal{D}) = \int_{x\sim\mathcal{D}}(f(x) - y)^2\mathcal{p}(x)\mathrm{d}x</script><h3 id="2-3-1-错误率和精度"><a href="#2-3-1-错误率和精度" class="headerlink" title="2.3.1 错误率和精度"></a>2.3.1 错误率和精度</h3><p>对于数据集D，分类错误率定义为</p>
+<script type="math/tex; mode=display">E(f;D)=\frac{1}{m}\sum_{i=1}^m I(f(x_i)\ne y_i)</script><p>精度则为</p>
+<script type="math/tex; mode=display">acc(f;D)=\frac{1}{m}\sum_{i=1}^m I(f(x_i)= y_i) \\
+ =1 - E(f;D)</script><p>更一般的，对于数据分布$\mathcal{D}$和概率密度$\mathcal{p}(\cdot)$来说，错误率和精度为</p>
+<script type="math/tex; mode=display">E(f;\mathcal{D})=\int_{x\sim\mathcal{D}}I(f(x_i)\ne y_i)\mathcal{p}(x)\mathrm{d}x</script><p>精度则为</p>
+<script type="math/tex; mode=display">acc(f;\mathcal{D})=\int_{x\sim\mathcal{D}}I(f(x_i)= y_i)\mathcal{p}(x)\mathrm{d}x \\
+=1 - E(f;\mathcal{D})</script><h3 id="2-3-2-查准率、查全率和F1"><a href="#2-3-2-查准率、查全率和F1" class="headerlink" title="2.3.2 查准率、查全率和F1"></a>2.3.2 查准率、查全率和F1</h3><p>如果不为了得到准确率，而是关心判断正确的样本中正确的比例，或者 有多少正例的样本被判断对了，则需要其他性能度量方法<br>查准率(precision)和查全率(recall)亦称为召回率更适合用于这类需求的性能度量</p>
+<p>对于二分问题，根据真实类别和学习器判断的类别组合成四个分类</p>
+<ol>
+<li>真正例(true positive) 真实为 正，预测也为 正 TP</li>
+<li>假正例(false positive) 真实为 负，预测为 正 FP</li>
+<li>真反例(true negative) 真实为 负， 预测为 负 TN</li>
+<li>假反例(false negative) 真实为 正，预测为 负 FN</li>
+</ol>
+<table border="0" cellpadding="0" cellspacing="0" width="300" style="border-collapse:
+ collapse;table-layout:fixed;width:225pt">
+ <col width="100" span="3" style="width:75pt">
+ <tr height="25" style="height:19.0pt">
+  <td rowspan="2" height="50" width="100" style="height:38.0pt;width:75pt">真实情况</td>
+  <td colspan="2" class="xl63" width="200" style="width:150pt">预测结果</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">正例</td>
+  <td>反例</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">正例</td>
+  <td>TP(真正例)</td>
+  <td>FN(假反例)</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">反例</td>
+  <td>FP(假正例)</td>
+  <td>TN(真反例)</td>
+ </tr>
+ <tr height="0" style="display:none">
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+ </tr>
+</table>
+
+
+<p>查准率P和查全率R分别为</p>
+<script type="math/tex; mode=display">P = \frac{TP}{TP + FP}</script><script type="math/tex; mode=display">R = \frac{TP}{TP + FN}</script><p>查准率和查全率互相制约，基本上一个比较高时，另一个则较低，因为如果想要查全率高，则需要尽量的判断为正，但是会增加假正例，所以降低了查准率。如果要查准率高，则尽量选择有把握的正例，则导致了真正例在所有正例的比例降低，所以查全率会降低。</p>
+<p>P-R曲线<br>根据学习器对样本的为正例的判断可信度排序，得到从最有可能是正例到最有可能是负例排序的样本，根据每个样本为阀值进行划分，判断前面的为正例，后面的为负例，得到查准率和查全率，用查全率作为横坐标，查准率作为纵坐标，得到曲线就是P-R曲线</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">%matplotlib inline</span><br><span class="line">y = np.array([<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>]) <span class="comment">#预测的类别</span></span><br><span class="line">y_hat = np.array([<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>]) <span class="comment">#实际的类别</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">(y,y_hat)</span>:</span></span><br><span class="line">    <span class="comment">#默认已经排序了，不写排序的代码</span></span><br><span class="line">    m = y_hat.shape[<span class="number">0</span>]</span><br><span class="line">    x = []</span><br><span class="line">    y = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,m + <span class="number">1</span>):</span><br><span class="line">        positive = y_hat[-i:]</span><br><span class="line">        nagetive = y_hat[:-i]</span><br><span class="line">        tp = positive.sum()</span><br><span class="line">        fp = len(positive) - tp</span><br><span class="line">        fn = nagetive.sum()</span><br><span class="line">        tn = len(nagetive) - fn</span><br><span class="line">        p = tp/float(len(positive))</span><br><span class="line">        r = tp / float(y_hat.sum())</span><br><span class="line">        x.append(r)</span><br><span class="line">        y.append(p)</span><br><span class="line">    <span class="keyword">return</span> x,y</span><br><span class="line"></span><br><span class="line">res = f(y,y_hat)</span><br><span class="line"></span><br><span class="line">plt.plot(res[<span class="number">0</span>],res[<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<pre><code>[&lt;matplotlib.lines.Line2D at 0x1a1b31d198&gt;]
+</code></pre><p><img src="/public/pic/output_27_1.png" alt="png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> precision_recall_curve</span><br><span class="line"><span class="keyword">from</span> sklearn.utils.fixes <span class="keyword">import</span> signature</span><br><span class="line">plt.figure(<span class="string">"P-R Curve"</span>)</span><br><span class="line">plt.title(<span class="string">'Precision/Recall Curve'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'Recall'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'Precision'</span>)</span><br><span class="line"><span class="comment">#y_true为样本实际的类别，y_scores为样本为正例的概率</span></span><br><span class="line">y_true = np.array([<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">y_scores = np.array([<span class="number">0.9</span>, <span class="number">0.75</span>, <span class="number">0.86</span>, <span class="number">0.47</span>, <span class="number">0.55</span>, <span class="number">0.56</span>, <span class="number">0.74</span>, <span class="number">0.62</span>, <span class="number">0.5</span>, <span class="number">0.86</span>, <span class="number">0.8</span>, <span class="number">0.47</span>, <span class="number">0.44</span>, <span class="number">0.67</span>, <span class="number">0.43</span>, <span class="number">0.4</span>, <span class="number">0.52</span>, <span class="number">0.4</span>, <span class="number">0.35</span>, <span class="number">0.1</span>])</span><br><span class="line">precision, recall, thresholds = precision_recall_curve(y_true, y_scores)</span><br><span class="line"><span class="comment">#print(precision)</span></span><br><span class="line"><span class="comment">#print(recall)</span></span><br><span class="line"><span class="comment">#print(thresholds)</span></span><br><span class="line">plt.plot(recall,precision)</span><br><span class="line"><span class="comment">#precision, recall, thresholds = precision_recall_curve(y_hat, y)</span></span><br><span class="line"><span class="comment">#print(recall)</span></span><br><span class="line"><span class="comment">#print(precision)</span></span><br><span class="line"><span class="comment">#plt.plot(recall,precision)</span></span><br></pre></td></tr></table></figure>
+<pre><code>[&lt;matplotlib.lines.Line2D at 0x1a1b2a14a8&gt;]
+</code></pre><p><img src="/public/pic/output_28_1.png" alt="png"></p>
+<p>如果学习器A的P-R曲线包裹学习器B的曲线，则表明A优于B，但是曲线相交，则用曲线下的面积来判断，但是这个值很难判断，所以有其他判断方式</p>
+<p>平衡点(Break-Even Point 简称BEP)，即查准率=查全率的时候.<br>BEP过于简单，所以一般使用F1度量,</p>
+<script type="math/tex; mode=display">F1=\frac{2 \times  P \times  R}{P+R}=\frac{2 \times  TP}{样例总数+ TP-TN}</script><p>通过对查准率和查全率的偏向，得到一个更一般的$F_\beta$,定义为</p>
+<script type="math/tex; mode=display">F_\beta = \frac{(1+\beta^2)\times P \times  R}{(\beta^2\times P)+R}</script><p>其中$\beta&gt;0$,度量了查全率对查准率的相对重要程度，当$\beta=1$就是标准的F1,$\beta &gt;1$则说明查全率更重要，$\beta&lt;1$说明查准率更重要</p>
+<p>假设进行了多次的训练/测试，就获得了多个二分类的混淆矩阵，要综合判定，则有两种方法</p>
+<p>一种是分别计算查准率和查全率，记为(P1,R1),(P2,R2),…$(P_n,R_n)$,在计算平均值，得到宏查准率(macro-P)，宏查全率(macro-R)，得到相应的宏F1(macro-F1)</p>
+<script type="math/tex; mode=display">macro-P= \frac{1}{n}\sum_{i=1}^nP_i</script><script type="math/tex; mode=display">macro-R = \frac{1}{n}\sum_{i=1}^nR_i</script><script type="math/tex; mode=display">macro-F1 = \frac{2\times macro-P\times macro-R}{macro-P+macro-R}</script><p>另一种为对混淆矩阵的元素，求平均值，得到对应的$\overline{TP}$,$\overline{TN}$,$\overline{FP}$,$\overline{FN}$<br>求得微查准率(micro-P)，微查全率(micro-R)，和对应的微F1(micro-F1)</p>
+<script type="math/tex; mode=display">micro-P = \frac{\overline{TP}}{\overline{TP}+ \overline{FP}}</script><pre><code>$$micro-R = \frac{\overline{Tp}}{\overline{TP} +\overline{FN}}$$
+$$micro-F1 = \frac{2 \times  micro-P \times  micro-R}{micro-P + micro-R}$$
+</code></pre><h3 id="2-3-3-ROC和AUC"><a href="#2-3-3-ROC和AUC" class="headerlink" title="2.3.3 ROC和AUC"></a>2.3.3 ROC和AUC</h3><p>P-R曲线对于样本不均衡的情况下，不稳定，所以可以使用ROC来判断</p>
+<p>ROC(Receiver Operation Characteristic)全称是受试者工作特征曲线，与P-R曲线类似，但是横纵坐标分别是 假正例率(False Positive Rate FPR)和 真正例率(True Positive Rate TPR)分别表示为</p>
+<script type="math/tex; mode=display">TPR=\frac{TP}{TP + FN}</script><script type="math/tex; mode=display">FPR = \frac{FP}{FP + TN}</script><p>如果学习器A的ROC曲线包裹学习器B的曲线，则表明A优于B,但是如果曲线交叉，则用去线下的面积AUC(Area Under ROC Curve)来判断好坏。</p>
+<p>假设ROC曲线是由{$(x_1,y_1),(x_2,y_2),…,(x_n,y_n$}的点组成的，则AUC可以估计为</p>
+<script type="math/tex; mode=display">AUC=\frac{1}{2}\sum_{i=1}^{m-1}(x_{i+1}- x_i)(y_i+y_{i+1})</script><p>可以看到AUC和样本预测的排序质量有关，假设有$m^+$,$m^-$个正反例，$D^+,D^-$表示正反例集合，则排序的损失(loss)函数为</p>
+<script type="math/tex; mode=display">\ell_{rank} = \frac{1}{m^+m^-}\sum_{x^+\in D^+}\sum_{x^-\in D^-}(I(f(x^+)<f(x^-))+ \frac{1}{2}I(f(x^+)=f(x^-)))</script><p>即考虑每对正反例，若正例预测值小于反例，则记一个”罚分”，若相等，则记半个”罚分”，因为学习器是预测正例的，所以理想的状态是，正例的最小预测值大于反例的最大预测值，$\ell_{rank}$对应的就是ROC曲线之上的面积；</p>
+<p>若一个正例在ROC曲线上对应标记点坐标为(x,y),则x恰好是排序在其之前的反例所占的比例，即假正例率，因此有</p>
+<script type="math/tex; mode=display">AUC = 1 - \ell_{rank}</script><h4 id="ROC曲线与P-R曲线的区别"><a href="#ROC曲线与P-R曲线的区别" class="headerlink" title="ROC曲线与P-R曲线的区别"></a>ROC曲线与P-R曲线的区别</h4><p>最主要的区别是ROC可以在样本不均衡的情况下做判断，而P-R曲线会有很大的影响，但是P-R曲线更加直观</p>
+<h3 id="2-3-4代价敏感错误率与代价曲线"><a href="#2-3-4代价敏感错误率与代价曲线" class="headerlink" title="2.3.4代价敏感错误率与代价曲线"></a>2.3.4代价敏感错误率与代价曲线</h3><p>不同哦该的错误造成的后果也不同，为不同类型错误所造成的不同损失，可为错误赋予非均等的代价(unqeual cost).</p>
+<p>根据领域知识得到一个代价矩阵(cost matrix),其中$cost_{ij}$表示第i类被预测为j类，一般来说$cost_{ii}$为0</p>
+<table border="0" cellpadding="0" cellspacing="0" width="300" style="border-collapse:
+ collapse;table-layout:fixed;width:225pt">
+ <col width="100" span="3" style="width:75pt">
+ <tr height="25" style="height:19.0pt">
+  <td rowspan="2" height="50" width="100" style="height:38.0pt;width:75pt">真实类别</td>
+  <td colspan="2" class="xl63" width="200" style="width:150pt">预测类别</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">第0类</td>
+  <td>第1类</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">第0类</td>
+  <td>0</td>
+  <td>$cost_{01}$</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">第1类</td>
+  <td>$cost_{10}$</td>
+  <td>0</td>
+ </tr>
+ <tr height="0" style="display:none">
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+ </tr>
+</table>
+
+<p>在非均等代价下，我们需要的不再是简单的最小化错误次数，而是最小化总体代价(total cost),将第0类作为正例，第1类作为反例，则代价敏感(cost-sensitive)的错误率为</p>
+<script type="math/tex; mode=display">E(f;D;cost)=\frac{1}{m}(\sum_{x_i \in D^+}I(f(x_i)\ne y_i )\times  cost_{01} + \sum_{x_i \in D^-}I(f(x_i)\ne y_i) \times  cost_{10})</script><p>在非均等代价下，ROC不能直接反应处学习器的期望总体代价，所以需要用代价曲线(cost curve)来达到目的,<br>横坐标为取值在[0,1]的正例概率代价</p>
+<script type="math/tex; mode=display">P(+)cost = \frac{ p\times cost_{01}}{p \times cost_{01}+(1-p)\times cost_{10}}</script><p>其中p为样例为正例的概率，纵坐标为取值为[0,1]的归一化代价</p>
+<script type="math/tex; mode=display">cost_{norm}=\frac{FNR\times p\times cost_{01}+ FPR\times (1-p)\times cost_{10}}{p\times cost_{01}+ (1-p)\times cost_{10}}</script><p>其中FPR为假正率，而FNR=1-TPR为假反例率</p>
+<h2 id="2-4-比较检验"><a href="#2-4-比较检验" class="headerlink" title="2.4 比较检验"></a>2.4 比较检验</h2><p>统计假设检验(hypothesis test)为我们在学习器性能比较提供了重要的依据，默认以错误率作为性能度量，用$\epsilon$表示</p>
+<h3 id="2-4-1-假设检验"><a href="#2-4-1-假设检验" class="headerlink" title="2.4.1 假设检验"></a>2.4.1 假设检验</h3><p>假设检验中的”假设”是对学习器泛化错误分布的某种判断或猜测，例”$\epsilon=\epsilon_0$”。在实际任务中，并不知道泛化错误率，只能知道其测试错误率$\hat{\epsilon}$,泛化错误率和测试错误率未必相同，但是两者接近的可能性较大，相差很远的可能性很小。因此可根据测试错误率推出泛化错误率的分布</p>
+<p>假设泛化错误为$\epsilon$,测试错误率为$\hat{\epsilon}$,$\hat{\epsilon}$意味着如果有m个样本，则会有$\hat{\epsilon}\times m$个样本会被分错。<br>假设测试样本，有$m’$个样本被分错,则泛化错误率为$\epsilon$的学习器将$m’$个样本分错的概率为$\tbinom{m}{m’}\epsilon^{m’}(1-\epsilon)^{m-m’}$,因此可以估计出恰好将$\hat{\epsilon}\times m$个样本分错的概率为</p>
+<script type="math/tex; mode=display">P(\hat{\epsilon};\epsilon)=\dbinom{m}{\hat{\epsilon}\times m}\epsilon^{\hat{\epsilon}\times m}(1-\epsilon)^{(m-\hat{\epsilon}\times m)}</script><p>对此求导，解$\frac{\partial P(\hat{\epsilon};\epsilon)}{\partial \epsilon}=0$得到$p(\hat{\epsilon};\epsilon)$在$\epsilon=\hat{\epsilon}$时最大，这符合二项分布(binomial)</p>
+<p>使用二项检验(binomial test)来对『$\epsilon \leq \epsilon_0$』这样的假设进行验证</p>
+<p>在$1-\alpha$的概率内所能得到的最大错误率为</p>
+<script type="math/tex; mode=display">\bar{\epsilon}=max\epsilon \qquad s.t \sum_{i=\epsilon_0 \times m +1}^m \dbinom{m}{i}\epsilon^i(1-\epsilon)^{m-i}<\alpha</script><p>其中$1-\alpha$反映了置信度(confidence),因为二项分布，随着p的变大，会向右偏，所以随着p的变大，会不满足条件，所以有个极值,就是需要得到这个最大值错误率，如果测试错误率小于这个最大错误率，则说明，在$1-\alpha$的置信度里，假设成立的，不能被拒绝，即认为在$1-\alpha$的置信度下，测试错误率为$\hat{\epsilon}$的学习器的泛化错误率不大于$\epsilon_0$。反之则需要拒绝</p>
+<p>但是一般不止做一次留出法估计，或者其交叉验证中k取2的估计，会进行很多次训练/测试,所以会得到很多错误率，这时可以用t验证(t-test)。</p>
+<p>假设得到了k个测试错误率$\hat{\epsilon_1},\hat{\epsilon_2},…,\hat{\epsilon_k}$,可以求的错误率$\mu$,方法$\sigma^2$为</p>
+<script type="math/tex; mode=display">\mu=\frac{1}{k}\sum_{i=1}^k\hat{\epsilon}_i</script><script type="math/tex; mode=display">\sigma^2 = \frac{1}{k-1}\sum_{i=1}^k(\hat{\epsilon}_i- \mu)</script><p>考虑到k个测试错误率可以看做繁华错误率$\epsilon_0$的独立采样，则t统计量为</p>
+<script type="math/tex; mode=display">\tau_t=\frac{\sqrt{k}(\mu - \epsilon_0)}{\sigma}</script><p>服从自由度为k-1的t分布</p>
+<p>得到的$\tau_t$如果小于查表得到的t值，则接受原假设，否则拒绝原假设</p>
+<h3 id="2-4-2-交叉验证t检验"><a href="#2-4-2-交叉验证t检验" class="headerlink" title="2.4.2 交叉验证t检验"></a>2.4.2 交叉验证t检验</h3><p>对于两个学习器A和B，使用k折交叉验证法得到的测试错误率分别为$\epsilon_1^A,\epsilon_2^A,…,\epsilon_k^A$和$\epsilon_1^B,\epsilon_2^B,…,\epsilon_k^B$,其中$\epsilon_i^A$和$\epsilon_i^B$是相同的第i折训练/测试集上得到的结果，则可用k折交叉验证”成对t验证”(paired t-tests)来进行比较。这里的思想为如果两个学习器的性能相同，则它们使用相同的训练/测试集得到的测试错误率应相同，即$\epsilon_i^A=\epsilon_i^B$</p>
+<p>对于k折交叉验证产生的k对测试错误率，先对每对的测试错误率求差，得到$\Delta_i=\epsilon_i^A-\epsilon_i^B$，若两个学习器性能相同，则差值均值应为0，因此对$\Delta_1,\Delta_2,…,\Delta_k$来对”学习器A和学习器B性能相同”的假设进行t验证,计算出$\Delta$的均值$\mu$和方差$\sigma^2$，在显著度$\alpha$下，若</p>
+<script type="math/tex; mode=display">\tau_t=\left|\frac{\sqrt{k}\mu}{\sigma}\right|</script><p>小于临界值$t_{\alpha/2,k-1}$则假设不能被拒绝，认为两个学习器的性能没有显著差异；否则则认为两个学习器有显著差异，且平均错误率较小的学习器性能更好，其中$t_{\alpha/2,k-1}$为自由度为k-1的t分布上尾部累积分布为$\alpha/2$的临界值</p>
+<p>进行有效的假设验证的一个重要的前提是测试错误率均为泛化错误率的独立 采样。但是通常情况下由于样本有限，在使用交叉验证等实验估计时，不同轮次的训练集都有不定程度的重叠，这使得测试错误率实际上并不独立，会导致过高估计假设成立的概率，为缓解这一问题，可采用”5$\times$2交叉验证”法。</p>
+<p>就是做5次2折交叉验证，在每次2折交叉验证之前水机将数据打乱，使得5次交叉验证中的数据划分不重复。对于学习器A和B，第i次2折交叉验证将产生两对测试错误率，对他们分别求差，得到1折的差值$\Delta_i^1$和2折的差值$\Delta_i^2$，为了缓解测试错误率的非独立性，我们仅计算第1次2折交叉验证的两个结果的平均值，$\mu=0.5(\Delta_1^1+\Delta_1^2)$,但对每次2折实验的结果都计算其方差$\sigma_i^2=(\Delta_i^1-\frac{\Delta_i^1+\Delta_i^2}{2})^2+ (\Delta_i^2-\frac{\Delta_i^1+\Delta_i^2}{2})^2$,变量</p>
+<script type="math/tex; mode=display">\tau_t=\frac{\mu}{\sqrt{0.2 \sum\limits_{i=1}^5 \sigma^2}}</script><p>服从自由度为5的t分布，其双边检验的临界值$t_{\alpha/2.5}$当，$\alpha=0.05$时，为2.5706，$\alpha=0.1$时，为2.0150</p>
+<h3 id="2-4-3-McNemar检验"><a href="#2-4-3-McNemar检验" class="headerlink" title="2.4.3 McNemar检验"></a>2.4.3 McNemar检验</h3><p>对于二类问题，使用留出法不仅可估计出学习器A和B的测试错误率，还能获得两个学习器分类结果的差别</p>
+<p>表: 两学习器分类差别列联表</p>
+<table border="0" cellpadding="0" cellspacing="0" width="300" style="border-collapse:
+ collapse;table-layout:fixed;width:225pt">
+ <col width="100" span="3" style="width:75pt">
+ <tr height="25" style="height:19.0pt">
+  <td rowspan="2" height="50" width="100" style="height:38.0pt;width:75pt">算法B</td>
+  <td colspan="2" class="xl63" width="200" style="width:150pt">算法A</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">正确</td>
+  <td>错误</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">正确</td>
+  <td>$e_{00}$</td>
+  <td>$e_{01}$</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">错误</td>
+  <td>$e_{10}$</td>
+  <td>$e_{11}$</td>
+ </tr>
+ <tr height="0" style="display:none">
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+ </tr>
+</table>
+
+<p>假设两个学习器性能相同，则应有$e_{01}=e_{10}$，那么$\left|e_{01}-e_{10}\right|$应当服从正态分布，McNemar检验考察变量</p>
+<script type="math/tex; mode=display">\tau_{\mathcal{X}^2}=\frac{(\left|e_{01}-e_{10}\right|-1)^2}{e_{01}+e_{10}}</script><p><strong>因为$e_{01}+e_{10}非常小，需要考虑连续性校正，所以分子中有-1$</strong></p>
+<p>服从自由度为1的$\mathcal{X}^2$分布，即标准正态分布变量的平方，盖顶显著度$\alpha$，当以上变量值小于临界值$\mathcal{X}^2$时，不能拒绝假设，认为两个学习器性能没有显著区别，否则拒绝原假设，认为两个学习器有限制差别，并且平均错误率小的那个学习器性能更好。</p>
+<h3 id="2-4-4-Friedman检验与Nemenyi后续检验"><a href="#2-4-4-Friedman检验与Nemenyi后续检验" class="headerlink" title="2.4.4 Friedman检验与Nemenyi后续检验"></a>2.4.4 Friedman检验与Nemenyi后续检验</h3><p>交叉验证T检验和McNemar检验都是在一个数据集上比较两个算法的的性能，但是很多情况下会在一组数据集上对多个算法进行比较，当有多个算法参与比较时，种方法是在每个数据集上分别列出两两比较的结果，而在亮亮比较上可以用前面的方法；另一种方法更为直接，使用基于算法排序的Friedman检验</p>
+<p>假设用$D_1,D_2,D_3,D_4$四个数据集对算法A、B、C进行比较，首先使用留出法或交叉验证法得到每个算法在每个数据集上的测试结果，然后在每个数据集上根据测试性能由好到坏排序，并赋值1,2,…;若算法的测试性能相同，则平分序值。列如得到如下的算法比较序值表</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>算法A</th>
+<th>算法B</th>
+<th>算法C</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$D_1$</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>$D_2$</td>
+<td>1</td>
+<td>2.5</td>
+<td>2.5</td>
+</tr>
+<tr>
+<td>$D_3$</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>$D_4$</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>平均序值</td>
+<td>1</td>
+<td>2.125</td>
+<td>2.875</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>然后，使用Friedman检验来判断这些算法是否性能相同，若相同，则他们的平均序值应当相同，假设我们在N个数据集上比较k个算法，令$\mathcal{r}_i$表示第i个算法的平均序值，为了简化讨论，暂不考虑评分序值的情况，则$\mathcal{r}_i$的均值和方差分别为(k+1)/2和$(k^2-1)/12$.变量</p>
+<script type="math/tex; mode=display">\tau_{\mathcal{X}^2}=\frac{k-1}{k}\cdot\frac{12N}{k^2-1}\sum_{i=1}^k(\mathcal{r}_i-\frac{k+1}{2})^2  \\
+=\frac{12N}{k(k+1)}(\sum_{i=1}^k\mathcal{r}_i^2-\frac{k(k+1)^2}{4})</script><p>在k和N都较大时，服从自由度为k-1的$\mathcal{X}^2$分布</p>
+<p>然而上述的”原始Friedman检验”过于保守，因为原始检验需要k较大(例如k&gt;30),现在通常使用变量</p>
+<script type="math/tex; mode=display">\tau_F=\frac{(N-1)\tau_{\mathcal{X}^2}}{N(k-1)-\tau_{\mathcal{X}^2}}</script><p>$\tau_F$服从自由度为k-1和(k-1)(N-1)的F分布</p>
+<p>若”所有算法的性能相同”这个假设被拒绝，则说明算法的性能显著不同，这是需要进行”后续检验”(post-hoc test)来进一步区分各算法，常用的有Nemenyi后续检验</p>
+<p>Nemenyi检验计算出平均序值差别的临界值域</p>
+<script type="math/tex; mode=display">CD=q\alpha\sqrt{\frac{k(k+1)}{6N}}</script><p>其中qa为Tukey分布的临界值，可以通过算法个数k和$\alpha$这两个参数查表得到，若两个算法的平均序值之差超过了临界值域CD，则以相同的置信度拒绝”两个算法性能相同”这一假设</p>
+<p>根据这一系列内容，可以得到上述例子的关系</p>
+<p>求出$\tau_F$的值为24.429，查F检验的表，得到$\alpha=0.05$临界值为5.143，因为大于临界值，所以拒绝原假设，然后使用”后续检验”，根据$\alpha=0.05$和k=3得到CD值为1.657，根据平均序值的差，可以得到A与B、B与C这两对算法没有显著区别，但是A与C是有显著区别的</p>
+<h2 id="2-5偏差和方差"><a href="#2-5偏差和方差" class="headerlink" title="2.5偏差和方差"></a>2.5偏差和方差</h2><p>除了估计其泛化性能之外，还需要了解具有这样的泛化性能的本质，所以”偏差-方差分解”(bias-variance decomposition)是解释学习算法泛化性能的一种重要工具</p>
+<p>偏差-方差分解试图对学习算法的期望泛化错误率进行拆解。对于测试样本x,令$y_D$为数据集中的标记，y为x的真实标记(因为有噪声，所以有可能$y_D\neq y$)$f(x;D)$为训练集D上学的模型f在x上的预测输出，以回归任务为例，</p>
+<p>学习算法的期望预测为</p>
+<script type="math/tex; mode=display">\bar{f}(x)=\mathbb{E}_D\left[f(x;D)\right] \qquad \mathbb{E}_D为在数据集D下的期望值</script><p>使用样本数相同的不同训练集产生的方差为</p>
+<script type="math/tex; mode=display">var(x)=\mathbb{E}_D\left[(f(x;D)-\bar{f}(x))^2\right]</script><p>噪声为</p>
+<script type="math/tex; mode=display">\epsilon^2=\mathbb{E}_D\left[(y_D-y)^2\right]</script><p>期望输出与实际标记的差别称为偏差(bias)，即</p>
+<script type="math/tex; mode=display">bias^2(x)=(\bar{f}(x)-y)^2</script><p>为了方便讨论，假定噪声期望为0，即$\epsilon^2=\mathbb{E}_D\left[(y_D-y)^2\right]=0$，通过简单的多项式展开合并，可以对算法的期望泛化误差进行分解</p>
+<script type="math/tex; mode=display">E(f;D)=\mathbb{E}_D\left[(f(x;D)-y_D)^2\right] \\
+=bias^2(x)+ var(x)+ \epsilon^2</script><p>也就是说泛化误差可分解为偏差、方差和噪声之和</p>
+<p>偏差度量了学习算法预测与真实结果的偏离程度，刻画了学习算法本身的拟合能力；方差度量了同样大小的训练集的变动所导致的学习性能的变化，即刻画了数据扰动所造成的影响；噪声则表达了在当前任务上任何学习算法能达到的期望泛化误差的下限，即刻画了学习问题本身的难度。</p>
+<p>偏差-方差分解说明了泛化性能是由学习算法的能力、数据的充分性及学习任务本身的难度所共同决定的。为了获得好的泛化性能，则需要使偏差较小，即能够充分拟合数据，并且使得方差较小，即使得数据扰动影响小</p>
+<p>一般而言，偏差和方差是有冲突的，称之为偏差-方差窘境(bias-variance dilemma)</p>
+<p>一个训练模型主要有三个阶段，当训练不足时，因为学习器的拟合能力不强，所以训练数据的扰动不足以影响学习器，所以偏差主导泛化错误率，当训练的加深，学习器的拟合能力加强，训练数据的扰动渐渐被学习器所获取，方差主导泛化错误率，但随之逐步加深，学习器的拟合能力过强，导致一些数据局部性的特性被学习器学习到，导致发生过拟合，即把数据独有的特性当成了共同的特性。</p>
+<h1 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h1><ol>
+<li>数据集包含1000个样本，其中正例和反例都是500个，用留出法获取70%的训练数据和30%的测试数据，共有多少种划分方式？</li>
+</ol>
+<p>留出法就是等比获取，也就是说在正例和反例都随机获取150个作为测试数据，不管训练数据，因为测试数据定好了，训练数据就是唯一得了。所以是$C_{150}^{500} C_{150}^{500}=\dbinom{500}{150}^2$个方式</p>
+<ol>
+<li>训练集包含100个样本，其中正反例各一半，假定学习算法所产生的模型是将新样本预测为训练样本较多的类别(训练样本数相同时进行随机猜测)，试给出10折交叉验证法和留一法分别对错误率进行估计所得的结果</li>
+</ol>
+<p>k折交叉验证，因为分出的数据是尽量保持和原本数据集的分布一致性，所以都是正反例各一半，所以错误率是50%，</p>
+<p>留一法，因为是选择一个数据样本当做测试集，所以根据训练样本反而因为测试集的那个样本的缺失，导致学习算法预测的是与测试集相反的结果，所以错误率是100%</p>
+<ol>
+<li>若学习器A的F1值比学习器B高，则A的BEP是否也比B高？</li>
+</ol>
+<p>BEP是把训练得到的正例可能性将真实数据从高到低进行排序，在根据各个阀值进行阶段，得到的曲线中找到P和R一样的点。</p>
+<p>F1则是根据混淆矩阵来的到P和R进行计算得到的。</p>
+<p>根据<a href="https://blog.csdn.net/icefire_tyh/article/details/52065867" target="_blank" rel="noopener">https://blog.csdn.net/icefire_tyh/article/details/52065867</a> 提供的例子可以看出BEP和F1并不想对等</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>真实数据排序</th>
+<th style="text-align:center">1/+</th>
+<th style="text-align:right">2/+</th>
+<th style="text-align:right">3/+</th>
+<th style="text-align:right">4/+</th>
+<th style="text-align:right">5/+</th>
+<th style="text-align:right">6/-</th>
+<th style="text-align:right">7/-</th>
+<th style="text-align:right">8/-</th>
+<th style="text-align:right">9/-</th>
+<th style="text-align:right">10/-</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学习器A的排序</td>
+<td style="text-align:center">1/+</td>
+<td style="text-align:right">2/+</td>
+<td style="text-align:right">3/+</td>
+<td style="text-align:right">4/+</td>
+<td style="text-align:right">6/-</td>
+<td style="text-align:right">5/-</td>
+<td style="text-align:right">7/-</td>
+<td style="text-align:right">8/-</td>
+<td style="text-align:right">9/-</td>
+<td style="text-align:right">10/-</td>
+</tr>
+<tr>
+<td>学习器B的排序</td>
+<td style="text-align:center">1/+</td>
+<td style="text-align:right">2/+</td>
+<td style="text-align:right">3/+</td>
+<td style="text-align:right">4/+</td>
+<td style="text-align:right">6/+</td>
+<td style="text-align:right">5/-</td>
+<td style="text-align:right">7/-</td>
+<td style="text-align:right">8/-</td>
+<td style="text-align:right">9/-</td>
+<td style="text-align:right">10/-</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>可以看出因为根据学习器A和学习器B的排序，将真实数据从高到低进行排序，得到的顺序是一致的，所以BEP一致，但是按照F1计算，则可以得到</p>
+<p>学习器A和B的混淆矩阵</p>
+<table border="0" cellpadding="0" cellspacing="0" width="400" style="border-collapse:
+ collapse;table-layout:fixed;width:300pt">
+ <col width="100" span="4" style="width:75pt">
+ <tr height="25" style="height:19.0pt">
+  <td height="25" width="100" style="height:19.0pt;width:75pt">学习器A</td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt">学习器B</td>
+  <td width="100" style="width:75pt"></td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" align="right" style="height:19.0pt">4</td>
+  <td align="right">1</td>
+  <td align="right">4</td>
+  <td align="right">1</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" align="right" style="height:19.0pt">0</td>
+  <td align="right">5</td>
+  <td align="right">1</td>
+  <td align="right">4</td>
+ </tr>
+ <tr height="0" style="display:none">
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+ </tr>
+</table>
+
+<p>学习器A和B的P、R、F1值</p>
+<table border="0" cellpadding="0" cellspacing="0" width="300" style="border-collapse:
+ collapse;table-layout:fixed;width:225pt">
+ <col width="100" span="3" style="width:75pt">
+ <tr height="25" style="height:19.0pt">
+  <td height="25" width="100" style="height:19.0pt;width:75pt"></td>
+  <td width="100" style="width:75pt">学习器A</td>
+  <td width="100" style="width:75pt">学习器B</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">P</td>
+  <td align="right">1</td>
+  <td align="right">0.8</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">R</td>
+  <td align="right">0.8</td>
+  <td align="right">0.8</td>
+ </tr>
+ <tr height="25" style="height:19.0pt">
+  <td height="25" style="height:19.0pt">F1</td>
+  <td align="right">0.88888889</td>
+  <td align="right">0.8</td>
+ </tr>
+ <tr height="0" style="display:none">
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+  <td width="100" style="width:75pt"></td>
+ </tr>
+</table>
+
+
+<ol>
+<li>试述正例率(TPR)，假正例率(FPR)，和查准率(P)、查全率(R)之间联系</li>
+</ol>
+<p>TPR和R是一样的，都是预测的正确正例在所有真实正例的比例。</p>
+<p>FPR是预测是正例但是实际是反例在所有真实反例的比例。P是预测正确的正例在所有预测为正例的比例，并没有实际关系</p>
+<ol>
+<li>试证明$AUC = 1 - \ell_{rank}$</li>
+</ol>
+<p>首先解析AUC公式，AUC公式是根据求线下的面积得到的。</p>
+<p>根据南瓜书(<a href="https://datawhalechina.github.io/pumpkin-book/#/chapter2/chapter2" target="_blank" rel="noopener">https://datawhalechina.github.io/pumpkin-book/#/chapter2/chapter2</a> )得知，书上的图为一个特例，即根据预测度进行排序后，根据每一个样本点是正例或者反例从而垂直或者水平前进；如果两个点都在阀值上，并且是一个正例和反例时，那则直线应该是斜方向前进的。不过无论是那种情况，都可以使用 $(上底+下底)<em>高</em> \cfrac{1}{2}$来获取阀值间隔内的面积。</p>
+<p>$\ell_{rank}=\frac{1}{m^+m^-}\sum_{x^+\in D^+}\sum_{x^-\in D^-}(I(f(x^+)&lt;f(x^-))+ \frac{1}{2}I(f(x^+)=f(x^-)))$</p>
+<p>根据南瓜书提供的图例，可以得到3个情况</p>
+<p>绿线为垂直向上，表示1个正例被正确判断，在y轴上的投影为”$\frac{1}{m^+}$”</p>
+<p>红线为水平向右，表示一个反例被错误判断成了正例，在x上的投影为”$\frac{1}{m^-}$”</p>
+<p>蓝线为朝着右上方向的斜线，表示有a个正例和b个反例被判断成了正例，则在x轴的投影为”$b\frac{1}{m^-}$”,在y轴上的投影为”$a\frac{1}{m^+}$”</p>
+<p>其中图像的每条折线的预测值相同，并且从0点开始逐渐较小。</p>
+<p>将公式拆分开来，<br>$\sum_{x^+ \in D^+}$可以看做对所有正例的一个遍历，分解成</p>
+<p>for $x_i^+ \;in \;D^+: \\<br>\qquad \frac{1}{m^+m^-}\sum_{x^-\in D^-}(I(f(x^+)&lt;f(x^-))+ \frac{1}{2}I(f(x^+)=f(x^-)))\qquad 记为公式S$</p>
+<p>其中$x_i^+$对应着每条绿线或者蓝线线段，遍历$x_i^+$可以看做遍历所有绿线和蓝线，S求出对应的绿线或蓝线和y轴组成的面积。</p>
+<p>详细内容，先看绿线<br>对于每条绿线线段，因为是单一的绿线，所以没有预测点既有正例和反例的情况，所以去除后半段，只看反例的预测点大于正例的预测点的情况。<br>所以S简化为</p>
+<script type="math/tex; mode=display">\frac{1}{m^+}\frac{1}{m^-}\sum_{x^-\in D^-}I(f(x_i^+)<f(x^-))</script><p>其中每一个空格的长度为$\frac{1}{m^-}$高度为$\frac{1}{m^+}$,$\sum_{x^-\in D^-}I(f(x_i^+)&lt;f(x^-))$为预测点大于正例的反例的个数，对应的就是空格的数量，乘以高和长，得到绿线左面的面积。</p>
+<p>对于蓝线，公式S展开为</p>
+<script type="math/tex; mode=display">\frac{1}{m^+}\frac{1}{m^-}\sum_{x^-\in D^-}I(f(x_i^+)<f(x^-)) \;+\; \frac{1}{m^+}\frac{1}{m^-}\sum_{x^-\in D^-}\frac{1}{2}I(f(x_i^+) \ne f(x^-))</script><p>有两个部分，其中前面的一部分就是蓝线左边的空格的面积，而右边的为自身的格子的左边的面积的，即为自身格子的左边的三角形面积。</p>
+<p>因为总面积为1，所以可以得到$AUC = 1 - \ell_{rank}$</p>
+<ol>
+<li>试述错误率和ROC曲线的关系</li>
+</ol>
+<p>错误率为$\frac{FP+FN}{FP+FN+TP+TN}$</p>
+<p>ROC有两个值为TPR和FPR，分别为$\frac{TP}{TP+FN}$，$\frac{FP}{FP+TN}$<br>每个点对应着一对TPR和FPR。</p>
+<script type="math/tex; mode=display">错误率= \frac{(FP+TN)\times FPR+(TP+FN)\times (1-TPR)}{TP+FN+TN+FP}</script><p>因为$m^+ = TP+FN,\;m^-=TN+FP$,所以用来代替，得到</p>
+<script type="math/tex; mode=display">错误率=\frac{m^-\times FPR +m^+\times (1-TPR)}{m^++m^-}</script><p>所以每个点可以用错误率来代替。错误率最小的点为FPR为0，TPR为1的时候</p>
+<p>代价敏感的错误率为$\frac{cost_{01}\times FN + cost_{10}\times FP}{m}$<br>所以代价敏感的错误率为</p>
+<script type="math/tex; mode=display">代价敏感错误率=\frac{m^-\times FPR\times cost_{10} +m^+\times (1-TPR)\times cost_{01}}{m^++m^-}</script><ol>
+<li>证明任意一条ROC曲线都有一条对应代价曲线与之对应，反之亦然</li>
+</ol>
+<p>以后补充</p>
+<ol>
+<li>Min—max规范化和z-score规范化两种常见的规范化方式。这两者有何优缺点。<br>令x为规范化前的取值，x’为规范化后的取值，其中$x_{min},x_{max}$为规范化前的最小值和最大值，$x_{min}’,x_{max}’$为规范化后的最小和最大取值，$\bar{x},\sigma_x$为规范化前的均值和标准差,则:</li>
+</ol>
+<p>Min-max的规范化公式为</p>
+<script type="math/tex; mode=display">x'= x_{min}' + \frac{x-x_{min}}{x_{max}- x_{min}}\times {x_{max}'-x_{min}'}</script><p>z-score的规范化公式为</p>
+<script type="math/tex; mode=display">x'=\frac{x- \bar{x}}{\sigma_x}</script><p>Min-max规范化的优势是，每次新的数据如果在$x_{min}$ $x_{max}$的范围内，则不需要重新计算其他值，并且得到规范化的值都是大于0的;但是如果有极小(大)值，会有影响</p>
+<p>z-score的优势是，极值对于规范化的影响不大，但是每次有新值时，都需要重新计算$\bar{x}$ $\sigma_x$</p>
+<ol>
+<li>试述$\mathcal{X}^2$检验过程</li>
+</ol>
+<p>适用于定类和定类的检验。</p>
+<p>以后补充</p>
+<ol>
+<li>试述Friedman检验中使用的两个方程区别</li>
+</ol>
+<p>即<script type="math/tex">\tau_{\mathcal{X}^2}=\frac{12N}{k(k+1)}(\sum\limits_{i=1}^k\mathcal{r}_i^2-\frac{k(k+1)^2}{4})</script></p>
+<p>和<script type="math/tex">\tau_F=\frac{(N-1)\tau_{\mathcal{X}^2}}{N(k-1)-\tau_{\mathcal{X}^2}}</script>的区别</p>
+<p>只知道$\tau_{\mathcal{X}^2}$需要满足k较大(k&gt;30)的情况下，在k较小的情况下，会倾向于认为无显著区别。但是$\tau_F$并没有这个影响</p>
+<p>详细的以后补充</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/machine-learning/" rel="tag"># machine learning</a>
+          
+            <a href="/tags/Data-Science/" rel="tag"># Data Science</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/10/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Yueyec</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#模型评估与选择"><span class="nav-number">1.</span> <span class="nav-text">模型评估与选择</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1经验误差与过拟合"><span class="nav-number">1.1.</span> <span class="nav-text">2.1经验误差与过拟合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-评估方法"><span class="nav-number">1.2.</span> <span class="nav-text">2.2 评估方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-1-留出法"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.2.1 留出法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-2-交叉验证法"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2.2 交叉验证法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-3-自助法"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.2.3 自助法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-4-调参和最终模型"><span class="nav-number">1.2.4.</span> <span class="nav-text">2.2.4 调参和最终模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-性能度量"><span class="nav-number">1.3.</span> <span class="nav-text">2.3 性能度量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-1-错误率和精度"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.3.1 错误率和精度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-2-查准率、查全率和F1"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.3.2 查准率、查全率和F1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-3-ROC和AUC"><span class="nav-number">1.3.3.</span> <span class="nav-text">2.3.3 ROC和AUC</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ROC曲线与P-R曲线的区别"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">ROC曲线与P-R曲线的区别</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-4代价敏感错误率与代价曲线"><span class="nav-number">1.3.4.</span> <span class="nav-text">2.3.4代价敏感错误率与代价曲线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-比较检验"><span class="nav-number">1.4.</span> <span class="nav-text">2.4 比较检验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-1-假设检验"><span class="nav-number">1.4.1.</span> <span class="nav-text">2.4.1 假设检验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-2-交叉验证t检验"><span class="nav-number">1.4.2.</span> <span class="nav-text">2.4.2 交叉验证t检验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-3-McNemar检验"><span class="nav-number">1.4.3.</span> <span class="nav-text">2.4.3 McNemar检验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-4-Friedman检验与Nemenyi后续检验"><span class="nav-number">1.4.4.</span> <span class="nav-text">2.4.4 Friedman检验与Nemenyi后续检验</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-5偏差和方差"><span class="nav-number">1.5.</span> <span class="nav-text">2.5偏差和方差</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#习题"><span class="nav-number">2.</span> <span class="nav-text">习题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yueyec</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
